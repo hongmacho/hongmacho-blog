@@ -2,10 +2,24 @@
 import ThemeToggle from '../ui/ThemeToggle';
 import WidthPicker from '../ui/WidthPicker';
 import MobileMenu from './MobileMenu.astro';
+import SearchOverlay from '../ui/SearchOverlay';
+import { getCollection } from 'astro:content';
 
 const pathname = Astro.url.pathname;
 const isActive = (path: string) =>
   path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/');
+
+// Fetch all blog posts for search
+const allPosts = await getCollection('blog');
+const blogPosts = allPosts.map((post) => ({
+  id: post.id,
+  title: post.data.title,
+  excerpt: post.data.excerpt,
+  category: post.data.category,
+  tags: post.data.tags,
+  date: post.data.date,
+  slug: post.id,
+}));
 ---
 
 <header class="site-header" id="site-header">
@@ -39,6 +53,8 @@ const isActive = (path: string) =>
   </div>
 </header>
 
+<SearchOverlay client:load allPosts={blogPosts} />
+
 <script>
   const header = document.getElementById('site-header');
   if (header) {
@@ -52,7 +68,7 @@ const isActive = (path: string) =>
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      document.getElementById('search-open-btn')?.click();
+      // SearchOverlay Island handles opening the modal via its global keydown listener
     }
   });
 </script>

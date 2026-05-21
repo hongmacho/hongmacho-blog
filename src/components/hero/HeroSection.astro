@@ -1,7 +1,11 @@
 ---
+import HeroParallax from './HeroParallax.tsx';
 ---
 
 <section class="hero hero--aurora">
+  <div class="hero__parallax-container">
+    <HeroParallax client:idle containerWidth={400} containerHeight={300} />
+  </div>
   <div class="container hero__inner">
     <div class="hero__greeting-pill">
       <span class="hero__greeting-dot" aria-hidden="true"></span>
@@ -93,5 +97,23 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.hero__parallax-container {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hero-parallax {
+  opacity: 0.5;
+}
+
+.hero-parallax__svg {
+  color: var(--text-secondary);
 }
 </style>
