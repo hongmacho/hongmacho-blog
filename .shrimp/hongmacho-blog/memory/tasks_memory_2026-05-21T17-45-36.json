@@ -1,0 +1,52 @@
+{
+  "tasks": [
+    {
+      "id": "4bfbc6eb-90c3-449b-8375-d3d5677fa8d8",
+      "name": "TASK-13.1: Create HeroParallax.tsx Island component",
+      "description": "Create React Island component at src/components/hero/HeroParallax.tsx that renders SVG graph visualization with requestAnimationFrame-based mouse tracking. Component updates 7 CSS custom properties (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) with 0.10 lerp damping factor. Implements mousemove/mouseleave event handlers. Includes prefers-reduced-motion detection to skip animation on accessibility mode. useEffect hook manages RAF loop setup and cleanup. Export as default. TypeScript strict mode, no any types.",
+      "notes": "CSS var defaults: --mx: 0, --my: 0, --mx-pct: 0%, --my-pct: 0%, --mx-px: 0px, --my-px: 0px, --m-deg: 0deg. Lerp formula ensures smooth damping without jank. RAF loop cancellation critical for cleanup on unmount. No global state mutation.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:34:25.558Z",
+      "updatedAt": "2026-05-21T17:35:53.350Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/hero/HeroParallax.tsx",
+          "type": "CREATE",
+          "description": "React Island component with parallax tracking logic"
+        }
+      ],
+      "implementationGuide": "1. Create file at src/components/hero/HeroParallax.tsx\n2. Define interface HeroParallaxProps (empty for now, can add SVG dimensions later)\n3. Implement useEffect hook that:\n   - Checks window.matchMedia('(prefers-reduced-motion: reduce)').matches on mount\n   - If reduced motion: set all 7 CSS vars to defaults and skip RAF\n   - If animation enabled: start RAF loop that runs on every frame\n4. Implement mousemove listener that captures event.clientX/clientY\n5. In RAF callback, calculate lerped values using 0.10 factor: newVal = currentVal + (targetVal - currentVal) * 0.10\n6. Update document.documentElement.style with all 7 CSS custom properties\n7. Implement mouseleave listener that resets all values to defaults (0 or 0deg)\n8. Return cleanup function that cancels RAF and removes listeners\n9. Render SVG graph (placeholder 200x200px for now, can be enhanced later)\n10. Add style block with CSS vars declared :root or component scoped\n11. Verify no console.log or debug code\n12. Export as named export for Island client:idle loading in HeroSection.astro",
+      "verificationCriteria": "Component renders without error. requestAnimationFrame is properly cancelled on unmount (check React DevTools Profiler). CSS vars update smoothly on mousemove without jank (60fps). prefers-reduced-motion=reduce disables animation (test via DevTools emulation). No console.log or debug statements. TypeScript strict mode passes (tsc --noEmit). Linter clean (ESLint).",
+      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation.",
+      "summary": "HeroParallax.tsx created with full RAF-based parallax implementation. Component correctly implements 7 CSS custom properties (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) with 0.10 lerp damping factor. Includes prefers-reduced-motion detection for accessibility. SVG tree placeholder renders correctly. All event listeners properly cleaned up on unmount.",
+      "completedAt": "2026-05-21T17:35:53.348Z"
+    },
+    {
+      "id": "c1a18510-0f77-4257-85e2-97e52dc2198c",
+      "name": "TASK-13.2: Integrate HeroParallax into HeroSection.astro",
+      "description": "Modify src/components/hero/HeroSection.astro to mount HeroParallax.tsx as client:idle Island inside hero container. Position HeroParallax absolutely behind text content using z-index layering. Update hero styles to accommodate Island rendering. Verify HeroParallax receives correct container dimensions and mouse event coordinates.",
+      "notes": "client:idle ensures HeroParallax loads after page interactive, not blocking LCP. Z-index layering critical: parallax must render behind text. Test on both desktop and mobile viewports.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "4bfbc6eb-90c3-449b-8375-d3d5677fa8d8"
+        }
+      ],
+      "createdAt": "2026-05-21T17:34:25.558Z",
+      "updatedAt": "2026-05-21T17:39:12.271Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/hero/HeroSection.astro",
+          "type": "TO_MODIFY",
+          "description": "Add HeroParallax Island import and mount with client:idle, update styles for z-index layering"
+        }
+      ],
+      "implementationGuide": "1. Open src/components/hero/HeroSection.astro\n2. Import HeroParallax component: import HeroParallax from './HeroParallax'\n3. Add <HeroParallax client:idle /> inside .hero__inner div, positioned behind text\n4. Update .hero CSS to set position: relative and establish stacking context\n5. Style HeroParallax wrapper to position: absolute, inset: 0, z-index: 0\n6. Ensure text content gets z-index: 1 for layering\n7. Add container/wrapper div around HeroParallax if needed for positioning\n8. Test that mouse movement triggers parallax effect when Island loads\n9. Verify mobile layout: HeroParallax should be hidden on small screens or scale appropriately\n10. Check that scroll and parallax don't conflict",
+      "verificationCriteria": "HeroSection renders with HeroParallax Island. Mouse movement triggers parallax effect (visual inspection). No layout shift or FOUC. Mobile view correct (no parallax jank on small screens). Build succeeds (npm run build). Astro linter clean.",
+      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation.",
+      "summary": "HeroParallax Island successfully integrated into HeroSection.astro with proper z-index layering (parallax z-index: 0, text z-index: 1). Component renders without errors with client:idle directive for non-blocking loading. Build passes (10 pages built in 4.26s). CSS vars (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) ready for mouse tracking. SVG tree graphic renders correctly. RAF loop and event listener cleanup properly implemented. Mobile layout accommodates Island rendering.",
+      "completedAt": "2026-05-21T17:39:12.270Z"
+    }
+  ]
+}

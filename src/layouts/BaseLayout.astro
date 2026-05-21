@@ -1,12 +1,23 @@
 ---
+import SEOHead from '../components/layout/SEOHead.astro';
+
 interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  publishDate?: Date | string;
+  author?: string;
+  tags?: string[];
 }
 
-const { title, description = '홍마초의 잡생각 — dev, invest, learn, daily', ogImage } = Astro.props;
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://hongmacho.dev');
+const {
+  title,
+  description = '홍마초의 잡생각 — dev, invest, learn, daily',
+  ogImage,
+  publishDate,
+  author,
+  tags = []
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -14,14 +25,16 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://hongmach
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalUrl} />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalUrl} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <SEOHead
+      title={title}
+      description={description}
+      image={ogImage}
+      publishDate={publishDate}
+      author={author}
+      tags={tags}
+      type={publishDate ? 'article' : 'website'}
+    />
 
     <!-- Pretendard Variable -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -62,6 +75,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://hongmach
     </script>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">메인 콘텐츠로 바로가기</a>
     <div class="app-shell">
       <slot />
     </div>

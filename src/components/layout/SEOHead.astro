@@ -1,0 +1,77 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  publishDate?: Date | string;
+  author?: string;
+  tags?: string[];
+  type?: 'article' | 'website';
+}
+
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  publishDate,
+  author = '홍마초',
+  tags = [],
+  type = 'website'
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://hongmacho.dev').href;
+
+// Generate JSON-LD schema
+const jsonLd = type === 'article' && publishDate
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description: description,
+      image: image,
+      datePublished: publishDate instanceof Date ? publishDate.toISOString() : publishDate,
+      author: {
+        '@type': 'Person',
+        name: author
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: '홍마초의 잡생각',
+        logo: {
+          '@type': 'ImageObject',
+          url: new URL('/logo.png', Astro.site ?? 'https://hongmacho.dev').href
+        }
+      }
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: title,
+      description: description,
+      url: canonicalUrl
+    };
+---
+
+<!-- Meta Tags -->
+<meta name="description" content={description} />
+<meta name="keywords" content={tags.length > 0 ? tags.join(', ') : 'dev, invest, learn, daily'} />
+<meta name="author" content={author} />
+
+<!-- Open Graph -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={image} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+
+<!-- Canonical -->
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

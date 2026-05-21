@@ -469,7 +469,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-13: Hero `tree` 변형 + 마우스 패럴렉스 Island
+### TASK-13: Hero `tree` 변형 + 마우스 패럴렉스 Island ✓ COMPLETED
 
 **설명:**  
 `tree` 변형 Hero 배경을 React Island로 구현한다.  
@@ -477,7 +477,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 **의존성:** TASK-09
 
-**파일:** `src/components/hero/HeroBGTree.tsx` (client:load)
+**파일:** `src/components/hero/HeroParallax.tsx` (client:idle)
 
 **구현 요구사항:**
 1. SVG 지식 그래프 (노드 + 엣지) 구현

@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import GiscusComments from '../components/comments/GiscusComments';
 import type { CollectionEntry } from 'astro:content';
 
 interface TocItem {
@@ -16,10 +17,18 @@ interface Props {
 }
 
 const { post, toc } = Astro.props;
-const { title, description, excerpt, category } = { ...post.data, description: post.data.excerpt };
+const { title, excerpt, date, tags } = post.data;
+
+// Parse date string (YYYY-MM-DD) to Date object
+const publishDate = new Date(date);
 ---
 
-<BaseLayout title={`${title} | 홍마초의 잡생각`} description={excerpt}>
+<BaseLayout
+  title={`${title} | 홍마초의 잡생각`}
+  description={excerpt}
+  publishDate={publishDate}
+  tags={tags}
+>
   <Header />
   <main class="article-page">
     <div class="container article-page__inner">
@@ -34,6 +43,15 @@ const { title, description, excerpt, category } = { ...post.data, description: p
         </aside>
       )}
     </div>
+    <section class="article-comments-section">
+      <div class="container">
+        <GiscusComments
+          client:visible
+          articleId={post.id}
+          articleTitle={title}
+        />
+      </div>
+    </section>
   </main>
   <Footer />
 </BaseLayout>
@@ -65,5 +83,16 @@ const { title, description, excerpt, category } = { ...post.data, description: p
 .toc-sticky {
   position: sticky;
   top: 88px;
+}
+
+.article-comments-section {
+  background-color: var(--color-bg-secondary, #f9fafb);
+  padding: 48px 0 80px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .article-comments-section {
+    background-color: var(--color-bg-secondary, #1f2937);
+  }
 }
 </style>

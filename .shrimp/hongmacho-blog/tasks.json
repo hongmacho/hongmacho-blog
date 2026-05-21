@@ -1,140 +1,440 @@
 {
   "tasks": [
     {
-      "id": "4bfbc6eb-90c3-449b-8375-d3d5677fa8d8",
-      "name": "TASK-13.1: Create HeroParallax.tsx Island component",
-      "description": "Create React Island component at src/components/hero/HeroParallax.tsx that renders SVG graph visualization with requestAnimationFrame-based mouse tracking. Component updates 7 CSS custom properties (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) with 0.10 lerp damping factor. Implements mousemove/mouseleave event handlers. Includes prefers-reduced-motion detection to skip animation on accessibility mode. useEffect hook manages RAF loop setup and cleanup. Export as default. TypeScript strict mode, no any types.",
-      "notes": "CSS var defaults: --mx: 0, --my: 0, --mx-pct: 0%, --my-pct: 0%, --mx-px: 0px, --my-px: 0px, --m-deg: 0deg. Lerp formula ensures smooth damping without jank. RAF loop cancellation critical for cleanup on unmount. No global state mutation.",
+      "id": "6233d223-0ff4-461d-a839-979c75b9c8c8",
+      "name": "TASK-16.1: Create SEOHead.astro Component",
+      "description": "Build SEOHead.astro static component to inject meta tags, JSON-LD structured data, and canonical URLs into document head. Component accepts props: title (string), description (string), image (string, URL), publishDate (Date, optional), author (string, optional), tags (string[], optional). Uses Astro.url to generate canonical URL dynamically. Implements Article JSON-LD schema when publishDate and author provided. No interactive elements required.",
+      "notes": "Canonical URL must use Astro.site for production builds. JSON-LD script must use application/ld+json type. Author field in schema should match byline format in blog posts. Tags should be included as keywords meta tag.",
       "status": "completed",
       "dependencies": [],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:35:53.350Z",
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:47:32.572Z",
       "relatedFiles": [
         {
-          "path": "src/components/hero/HeroParallax.tsx",
+          "path": "src/components/layout/BaseLayout.astro",
+          "type": "REFERENCE",
+          "description": "Layout template to import SEOHead into frontmatter section",
+          "lineStart": 1,
+          "lineEnd": 30
+        },
+        {
+          "path": "src/components/layout/SEOHead.astro",
           "type": "CREATE",
-          "description": "React Island component with parallax tracking logic"
+          "description": "New SEO meta tags and structured data component"
         }
       ],
-      "implementationGuide": "1. Create file at src/components/hero/HeroParallax.tsx\n2. Define interface HeroParallaxProps (empty for now, can add SVG dimensions later)\n3. Implement useEffect hook that:\n   - Checks window.matchMedia('(prefers-reduced-motion: reduce)').matches on mount\n   - If reduced motion: set all 7 CSS vars to defaults and skip RAF\n   - If animation enabled: start RAF loop that runs on every frame\n4. Implement mousemove listener that captures event.clientX/clientY\n5. In RAF callback, calculate lerped values using 0.10 factor: newVal = currentVal + (targetVal - currentVal) * 0.10\n6. Update document.documentElement.style with all 7 CSS custom properties\n7. Implement mouseleave listener that resets all values to defaults (0 or 0deg)\n8. Return cleanup function that cancels RAF and removes listeners\n9. Render SVG graph (placeholder 200x200px for now, can be enhanced later)\n10. Add style block with CSS vars declared :root or component scoped\n11. Verify no console.log or debug code\n12. Export as named export for Island client:idle loading in HeroSection.astro",
-      "verificationCriteria": "Component renders without error. requestAnimationFrame is properly cancelled on unmount (check React DevTools Profiler). CSS vars update smoothly on mousemove without jank (60fps). prefers-reduced-motion=reduce disables animation (test via DevTools emulation). No console.log or debug statements. TypeScript strict mode passes (tsc --noEmit). Linter clean (ESLint).",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation.",
-      "summary": "HeroParallax.tsx created with full RAF-based parallax implementation. Component correctly implements 7 CSS custom properties (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) with 0.10 lerp damping factor. Includes prefers-reduced-motion detection for accessibility. SVG tree placeholder renders correctly. All event listeners properly cleaned up on unmount.",
-      "completedAt": "2026-05-21T17:35:53.348Z"
+      "implementationGuide": "1. Create src/components/layout/SEOHead.astro in frontmatter section.\n2. Define props interface: {title, description, image, publishDate?, author?, tags?}.\n3. Generate canonical URL: new URL(Astro.url.pathname, Astro.site).href.\n4. Implement Article JSON-LD when publishDate exists: {\"@context\": \"https://schema.org\", \"@type\": \"Article\", \"headline\": title, \"description\": description, \"image\": image, \"datePublished\": publishDate, \"author\": {\"@type\": \"Person\", \"name\": author}}.\n5. Render <meta> tags: og:title, og:description, og:image, og:type=\"article\", twitter:card, twitter:title, twitter:description, twitter:image.\n6. Render <link rel=\"canonical\"> with generated URL.\n7. Render <script type=\"application/ld+json\"> with JSON-LD object stringified.\n8. Match existing design token patterns (no new CSS, no inline styles).\n9. Test with offline validator: schema.org JSON-LD validator.",
+      "verificationCriteria": "1. Component renders without errors in ArticleLayout and BaseLayout contexts.\n2. Meta tags present in rendered HTML: og:title, og:description, og:image, canonical link.\n3. JSON-LD schema valid per schema.org validator (article type with headline, description, image, datePublished, author).\n4. Canonical URL matches Astro.url.pathname.\n5. No TypeScript errors (strict mode).\n6. lsp_diagnostics passes on SEOHead.astro.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "SEOHead.astro component created and integrated into BaseLayout and ArticleLayout. Meta tags (og:*, twitter:*), canonical links, and JSON-LD Article schema render correctly. Build passes. All meta tags and structured data verified in production HTML output. Keywords tag includes blog post tags. No TypeScript errors.",
+      "completedAt": "2026-05-21T17:47:32.571Z"
     },
     {
-      "id": "c1a18510-0f77-4257-85e2-97e52dc2198c",
-      "name": "TASK-13.2: Integrate HeroParallax into HeroSection.astro",
-      "description": "Modify src/components/hero/HeroSection.astro to mount HeroParallax.tsx as client:idle Island inside hero container. Position HeroParallax absolutely behind text content using z-index layering. Update hero styles to accommodate Island rendering. Verify HeroParallax receives correct container dimensions and mouse event coordinates.",
-      "notes": "client:idle ensures HeroParallax loads after page interactive, not blocking LCP. Z-index layering critical: parallax must render behind text. Test on both desktop and mobile viewports.",
+      "id": "25b1effe-f8d7-492f-9593-1da088a8cf65",
+      "name": "TASK-16.2: Create RSS Feed Endpoint",
+      "description": "Build /feed.xml static route that generates RSS 2.0 XML feed for all blog posts. Endpoint iterates getCollection('blog'), sorts by date descending, generates RSS item for each post with title, link, description (excerpt), pubDate, and categories (tags). Returns valid RSS 2.0 XML with Content-Type: application/rss+xml.",
+      "notes": "Channel link should point to Astro.site/blog. Language must be 'ko' for Korean. Each item guid must be unique (use slug). pubDate must be RFC 822 formatted. Categories should use tag values. Test with RSS reader (Feedly, Apple News) to ensure parsing.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:49:29.979Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/feed.xml.ts",
+          "type": "CREATE",
+          "description": "RSS feed endpoint for /feed.xml"
+        },
+        {
+          "path": "src/content/blog",
+          "type": "REFERENCE",
+          "description": "Blog post collection source for feed items"
+        }
+      ],
+      "implementationGuide": "1. Create src/pages/feed.xml.ts as Astro endpoint.\n2. Export async function: export async function GET(context) { ... } returning Response.\n3. Import getCollection from 'astro:content'.\n4. Fetch all blog posts: const posts = await getCollection('blog').\n5. Sort by date descending: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).\n6. Generate RSS 2.0 template: <?xml version=\"1.0\" encoding=\"utf-8\"?><rss version=\"2.0\"> with channel (title, link, description, language=\"ko\", lastBuildDate).\n7. For each post, append <item>: <title>, <link>, <description>, <pubDate>, <category> for each tag, <guid> (use slug).\n8. Convert Date objects to RFC 822 format: new Date().toUTCString().\n9. Return new Response(rssBody, {headers: {\"Content-Type\": \"application/rss+xml; charset=utf-8\"}}).\n10. Validate output with online RSS validator.",
+      "verificationCriteria": "1. GET /feed.xml returns HTTP 200 with Content-Type application/rss+xml.\n2. XML is valid (no parsing errors).\n3. RSS 2.0 schema valid per feedvalidator.org or similar.\n4. All blog posts appear as items, sorted by date descending.\n5. Each item has title, link, description, pubDate, category tags, guid.\n6. Dates are RFC 822 formatted (e.g., Wed, 22 May 2026 02:00:00 GMT).\n7. Feed accessible at /feed.xml after build.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "RSS 2.0 feed endpoint created at /src/pages/feed.xml.ts. Generates valid XML with all 5 blog posts sorted by date descending. Each item includes title, link, description, pubDate (RFC 822), categories (tags), and guid. Channel metadata includes title, link, description, language (ko), and lastBuildDate. Build verified successfully with no errors. Feed accessible at /feed.xml in production build.",
+      "completedAt": "2026-05-21T17:49:29.978Z"
+    },
+    {
+      "id": "6962790e-ae97-4ecc-87a1-3f12a93fb47e",
+      "name": "TASK-16.3: Create Sitemap and robots.txt",
+      "description": "Build /sitemap.xml static route listing all static routes (home, about, blog, blog posts) and /robots.txt configuration. Sitemap includes URLs, last-modified dates (post date for blog posts, build time for static), and priority (1.0 for home/blog, 0.8 for posts, 0.7 for static). robots.txt allows all crawlers, references sitemap URL.",
+      "notes": "Sitemap XML must use lastmod in YYYY-MM-DD format. Priority is 0.0-1.0 float. robots.txt does not require specific format, plain text is sufficient. Sitemap URL must use full Astro.site URL. Test with Search Console (Google, Naver).",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:50:48.215Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/sitemap.xml.ts",
+          "type": "CREATE",
+          "description": "Sitemap XML endpoint"
+        },
+        {
+          "path": "public/robots.txt",
+          "type": "CREATE",
+          "description": "robots.txt crawler configuration"
+        }
+      ],
+      "implementationGuide": "1. Create src/pages/sitemap.xml.ts endpoint:\n   a. Export async function GET(context).\n   b. Fetch all blog posts: const posts = await getCollection('blog').\n   c. Build URL array: [{loc: Astro.site, lastmod: new Date().toISOString().split('T')[0], priority: 1.0}, {loc: Astro.site/blog, priority: 1.0}, {loc: Astro.site/about, priority: 0.7}, ...posts with {loc: Astro.site/blog/post.id, lastmod: post.data.date, priority: 0.8}].\n   d. Generate XML: <?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"> with <url> for each entry.\n   e. Return Response with Content-Type: application/xml.\n2. Create public/robots.txt:\n   User-agent: *\n   Allow: /\n   Sitemap: {Astro.site}/sitemap.xml\n3. Validate sitemap.xml with online validator.",
+      "verificationCriteria": "1. GET /sitemap.xml returns valid XML with urlset root element.\n2. All routes present: /, /blog, /about, /blog/[slug] for all posts.\n3. lastmod dates correct (post.data.date for blog posts, current date for static).\n4. Priority values: 1.0 for /, /blog; 0.8 for posts; 0.7 for static.\n5. robots.txt file exists at public/robots.txt with User-agent: *, Allow: /, Sitemap URL.\n6. Both files serve correctly after build.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "Successfully created sitemap.xml endpoint and robots.txt file. Sitemap generates valid XML with 8 URLs (home, blog index, about, and 5 blog posts) with appropriate priorities (1.0 for home/blog, 0.8 for posts, 0.7 for about) and correct lastmod dates. robots.txt configured with allow all, disallow /404, and sitemap reference. Build verified, files generated correctly.",
+      "completedAt": "2026-05-21T17:50:48.213Z"
+    },
+    {
+      "id": "c62e4d59-1867-4c2e-afd0-592a6d65a911",
+      "name": "TASK-16.4: Integrate SEOHead into BaseLayout and ArticleLayout",
+      "description": "Import SEOHead.astro into BaseLayout.astro (frontmatter section) and ArticleLayout.astro. Pass appropriate props: BaseLayout receives fallback (site title, description, logo image). ArticleLayout receives post-specific data (title, excerpt, image, date, author, tags). Verify meta tags render in final HTML.",
+      "notes": "BaseLayout should pass SEOHead near </head> closing tag if layout has one. ArticleLayout integration depends on existing Markdown layout pattern. Verify that Astro.props correctly exposes frontmatter data. If layout uses separate head component, integrate SEOHead there.",
       "status": "completed",
       "dependencies": [
         {
-          "taskId": "4bfbc6eb-90c3-449b-8375-d3d5677fa8d8"
+          "taskId": "6233d223-0ff4-461d-a839-979c75b9c8c8"
         }
       ],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:39:12.271Z",
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:51:51.763Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/BaseLayout.astro",
+          "type": "TO_MODIFY",
+          "description": "Import and render SEOHead with default props",
+          "lineStart": 1,
+          "lineEnd": 50
+        },
+        {
+          "path": "src/layouts/ArticleLayout.astro",
+          "type": "TO_MODIFY",
+          "description": "Import and render SEOHead with post-specific props"
+        }
+      ],
+      "implementationGuide": "1. Open src/components/layout/BaseLayout.astro.\n2. In frontmatter section (top), add: import SEOHead from '../layout/SEOHead.astro'.\n3. Define BaseLayout props: {title?: string, description?: string, image?: string}.\n4. Set defaults: const siteTitle = title || '홍마초의 잡생각'. const siteDesc = description || 'Software engineering, thoughts, and musings'. const siteLogo = image || '/og-image.png'.\n5. In template, render <SEOHead title={siteTitle} description={siteDesc} image={siteLogo} /> before closing </head> (if head exists in layout) or in a <head> placeholder.\n6. Open src/layouts/ArticleLayout.astro.\n7. Add: import SEOHead from '../components/layout/SEOHead.astro'.\n8. Receive frontmatter props from Markdown: const {frontmatter} = Astro.props or const {title, excerpt, image, date, author, tags} = Astro.props.\n9. Render: <SEOHead title={title} description={excerpt} image={image} publishDate={date} author={author} tags={tags} />.\n10. Test: Build project, inspect rendered HTML for meta tags.",
+      "verificationCriteria": "1. BaseLayout imports SEOHead without errors.\n2. ArticleLayout imports SEOHead and receives post props (title, excerpt, date, author, tags).\n3. Rendered HTML includes meta tags from SEOHead (og:, canonical, JSON-LD) on all pages.\n4. No TypeScript errors in both layouts (strict mode).\n5. lsp_diagnostics passes on BaseLayout.astro and ArticleLayout.astro.\n6. Build succeeds: npm run build.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "SEOHead component successfully integrated into BaseLayout and ArticleLayout. All meta tags (Open Graph, Twitter Card, canonical), JSON-LD schemas (Article for posts, WebSite for pages), and description tags render correctly in generated HTML. Build verification confirms all pages generate with proper SEO metadata.",
+      "completedAt": "2026-05-21T17:51:51.759Z"
+    },
+    {
+      "id": "f344f200-ea96-432a-b238-090ca3f994a5",
+      "name": "TASK-17.1: Create GiscusComments React Island",
+      "description": "Build GiscusComments.tsx React component as Island (client:visible) for lazy-loaded comments section below blog posts. Component initializes Giscus API with GitHub repository, maps current theme (light/dark) to Giscus theme prop. Listens for data-theme changes on <html> element and updates Giscus theme dynamically. Accepts props: articleId (slug), articleTitle (string).",
+      "notes": "Giscus API requires GISCUS_REPO, GISCUS_REPO_ID, GISCUS_CATEGORY_ID environment variables (from GitHub repository setup). Theme switching uses data-theme attribute read from <html>, must match BaseLayout theme state. Script injection must handle cleanup to prevent duplicate scripts. Test with mock GitHub API if repo unavailable.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:52:48.550Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/comments/GiscusComments.tsx",
+          "type": "CREATE",
+          "description": "React Island component for GitHub Discussions comments"
+        },
+        {
+          "path": "src/layouts/ArticleLayout.astro",
+          "type": "REFERENCE",
+          "description": "Target layout to import GiscusComments Island"
+        }
+      ],
+      "implementationGuide": "1. Create src/components/comments/GiscusComments.tsx as React component (not .jsx).\n2. Import React hooks: import {useEffect, useRef, useState} from 'react'.\n3. Define props interface: interface GiscusCommentsProps {articleId: string; articleTitle: string;}.\n4. Initialize state: const [theme, setTheme] = useState<'light' | 'dark'>('light').\n5. In useEffect (runs on mount):\n   a. Read theme from <html data-theme> attribute: const htmlTheme = document.documentElement.getAttribute('data-theme').\n   b. Set state: setTheme(htmlTheme === 'dark' ? 'dark' : 'light').\n   c. Create MutationObserver to listen for data-theme changes: const observer = new MutationObserver(() => { ... }).\n   d. Observe <html> attributes: observer.observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']}).\n   e. Return cleanup: () => observer.disconnect().\n6. Add second useEffect to inject Giscus script when theme or articleId changes:\n   a. Create <div id=\"giscus-container\"></div> in DOM.\n   b. Inject Giscus script tag dynamically: const script = document.createElement('script').\n   c. Set attributes: script.src = 'https://giscus.app/client.js'. script.async = true. script.crossOrigin = 'anonymous'.\n   d. Data attributes: script.setAttribute('data-repo', '{GISCUS_REPO}'). script.setAttribute('data-repo-id', '{GISCUS_REPO_ID}'). script.setAttribute('data-category', 'Blog Comments'). script.setAttribute('data-category-id', '{GISCUS_CATEGORY_ID}'). script.setAttribute('data-mapping', 'og:title'). script.setAttribute('data-theme', theme). script.setAttribute('data-reactions-enabled', '1'). script.setAttribute('data-emit-metadata', '1'). script.setAttribute('data-input-position', 'bottom'). script.setAttribute('data-lang', 'ko').\n   e. Append to container: document.getElementById('giscus-container')?.appendChild(script).\n   f. Cleanup: Remove script on unmount or theme change.\n7. Return JSX: <div className=\"comments-section\"><div id=\"giscus-container\" /></div>.\n8. Match existing component naming (PascalCase file, export default component).",
+      "verificationCriteria": "1. Component renders without errors (client-side).\n2. Giscus script tag injected into DOM with correct data attributes.\n3. Theme switches from light to dark when <html data-theme> changes.\n4. MutationObserver correctly detects data-theme attribute changes.\n5. No console errors or memory leaks (cleanup on unmount).\n6. TypeScript strict mode passes (no any types).\n7. Island loads with client:visible directive (below-fold lazy loading).\n8. lsp_diagnostics passes on GiscusComments.tsx.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "GiscusComments React Island created at src/components/comments/GiscusComments.tsx. Component properly implements theme listening via MutationObserver on data-theme attribute, dynamic Giscus script injection with all required data attributes (repo, repo-id, category-id, mapping, theme, reactions, etc.), and proper cleanup on unmount/changes. TypeScript strict mode compliant, no any types. Build verification successful.",
+      "completedAt": "2026-05-21T17:52:48.549Z"
+    },
+    {
+      "id": "2ff4eb9e-4d2c-4395-9703-ea5e103399ee",
+      "name": "TASK-17.2: Integrate GiscusComments Island into ArticleLayout",
+      "description": "Import GiscusComments as Island into ArticleLayout.astro. Place below article content (after </article> closing tag). Pass articleId (post slug) and articleTitle props from frontmatter data. Set client:visible directive for lazy-load below-fold behavior. Verify comments section renders correctly on article pages.",
+      "notes": "client:visible directive ensures script only loads when comments section enters viewport (performance optimization). slug must match Giscus mapping='og:title' (uses article title for deduplication). Verify existing ArticleLayout pattern for receiving frontmatter data.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f344f200-ea96-432a-b238-090ca3f994a5"
+        }
+      ],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T18:03:47.820Z",
+      "relatedFiles": [
+        {
+          "path": "src/layouts/ArticleLayout.astro",
+          "type": "TO_MODIFY",
+          "description": "Import GiscusComments Island and render below article content",
+          "lineStart": 1,
+          "lineEnd": 80
+        }
+      ],
+      "implementationGuide": "1. Open src/layouts/ArticleLayout.astro.\n2. In frontmatter section, add: import GiscusComments from '../components/comments/GiscusComments'.\n3. Receive post slug and title from frontmatter: const {slug} = Astro.params. const {title} = frontmatter (or Astro.props depending on existing pattern).\n4. In template, after </article> closing tag, add: <GiscusComments client:visible articleId={slug} articleTitle={title} />.\n5. Wrap in semantic <section> if desired: <section className=\"article-comments\"><GiscusComments client:visible ... /></section>.\n6. Build and test: npm run build && npm run preview. Navigate to a blog post, scroll below article to verify comments section loads.\n7. Check that theme switching (Header ThemeToggle) updates Giscus theme dynamically.",
+      "verificationCriteria": "1. ArticleLayout imports GiscusComments without errors.\n2. GiscusComments Island renders below article content on all post pages.\n3. client:visible directive applied (lazy-load on scroll).\n4. Comments section loads when scrolled into view (verified in DevTools).\n5. Theme switches correctly when Header ThemeToggle changes data-theme.\n6. No TypeScript errors (strict mode).\n7. lsp_diagnostics passes on ArticleLayout.astro.\n8. Build and preview succeed without errors.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "GiscusComments Island이 ArticleLayout.astro에 완전히 통합됨. import 선언, article-comments-section 래퍼, client:visible directive, articleId=post.id, articleTitle=title props 모두 정상. 별도 배경색 섹션으로 레이아웃 구분됨.",
+      "completedAt": "2026-05-21T18:03:47.819Z"
+    },
+    {
+      "id": "485ed7b2-0c02-4df2-8363-7d0120b04423",
+      "name": "TASK-18.1: Audit Components for WCAG 2.1 AA Compliance",
+      "description": "Systematically audit all Phase 0-1 components (Header, HeroSection, ArticleLayout, SearchOverlay, Footer, etc.) and new Phase 2 components (SEOHead, GiscusComments) for WCAG 2.1 AA compliance. Use axe DevTools browser extension and manual testing to identify violations. Document findings: heading hierarchy issues, color contrast failures, missing ARIA labels, keyboard navigation problems, focus indicators, alt text gaps.",
+      "notes": "axe DevTools categories: Violations (must fix), Best Practices (should fix), Needs Review (manual assessment). WCAG 2.1 AA requires CONTRAST (4.5:1), HEADING_ORDER, BUTTON_NAME (aria-label or text), LINK_NAME, FOCUS_VISIBLE. Test with screen reader (macOS VoiceOver, NVDA) if possible. Keyboard navigation critical for A11y compliance.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:55:40.515Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/Header.astro",
+          "type": "REFERENCE",
+          "description": "Navigation component to audit for ARIA, keyboard nav, focus"
+        },
+        {
+          "path": "src/components/hero/HeroSection.astro",
+          "type": "REFERENCE",
+          "description": "Hero component to audit for heading, contrast, animations"
+        },
+        {
+          "path": "src/layouts/ArticleLayout.astro",
+          "type": "REFERENCE",
+          "description": "Article layout to audit for heading hierarchy, links, form accessibility"
+        }
+      ],
+      "implementationGuide": "1. Install axe DevTools browser extension (Chrome/Firefox).\n2. Build project: npm run build && npm run preview.\n3. For each component/page:\n   a. Open in browser (localhost:3000 for dev, preview URL for build).\n   b. Open DevTools → axe DevTools tab.\n   c. Scan for violations (Violations, Best Practices, Needs Review).\n   d. Document each issue: component name, violation type (heading, contrast, ARIA, keyboard, focus), severity (critical/serious/moderate/minor).\n4. Manual testing checklist per page:\n   a. Heading hierarchy: h1 on page (single), proper nesting (h2 under h1, h3 under h2, no skips).\n   b. Color contrast: Use Chrome DevTools Inspect → Accessibility tab, verify ≥4.5:1 for normal text, ≥3:1 for large text.\n   c. Keyboard navigation: Tab through all interactive elements, verify no keyboard traps, focus order logical.\n   d. Focus indicators: Verify focus outline visible on all focusable elements (buttons, links, inputs), high contrast.\n   e. Alt text: All images have descriptive alt text (not empty, not filename).\n   f. ARIA labels: Icon buttons (search, theme toggle, menu) have aria-label.\n   g. Form fields: All inputs have associated <label> or aria-label, required indicators, error messages.\n5. Create accessibility findings document (not committed, used as reference for fixes).",
+      "verificationCriteria": "1. axe DevTools scan completes with zero Violations (all critical/serious issues resolved).\n2. Color contrast verified ≥4.5:1 for normal text, ≥3:1 for large text (Chrome DevTools Accessibility panel).\n3. Heading hierarchy correct: h1 single per page, proper nesting, no skips.\n4. Keyboard navigation: Tab through all pages, no traps, logical focus order.\n5. Focus indicators visible on all interactive elements (high contrast outline).\n6. All images have descriptive alt text (verified via axe alt-text checks).\n7. Icon buttons have aria-label (verified via axe button-name checks).\n8. Form fields have labels/aria-label and required indicators.\n9. Manual testing with screen reader: basic navigation works (headings, buttons, links accessible).\n10. No console errors or warnings (axe-core, browser).",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives.",
+      "summary": "Accessibility audit completed comprehensively. Systematic examination of all Phase 0-2 components documented in .omc/accessibility-audit-findings.md with WCAG 2.1 AA violations categorized by severity. 5 CRITICAL issues identified (SearchOverlay keyboard/ARIA), 9 SERIOUS issues (focus indicators, animation motion), multiple MODERATE issues. All findings include specific line references, WCAG criteria citations, and recommended fixes ready for implementation in TASK-18.2-18.5.",
+      "completedAt": "2026-05-21T17:55:40.514Z"
+    },
+    {
+      "id": "eb571965-dce1-4a0b-ac6e-ed886e740c8f",
+      "name": "TASK-18.2: Fix Heading Hierarchy and Semantic HTML",
+      "description": "Correct heading hierarchy across all pages: ensure single h1 per page, proper h2/h3/h4 nesting (no skips). Review HeroSection, ArticleLayout, and page templates. Add missing <main>, <article>, <nav>, <section> semantic elements. Update Header navigation landmark. Verify heading order with axe DevTools after changes.",
+      "notes": "axe checks: HEADING_ORDER (no skips), HEADING (headings exist), LANDMARK (main, nav, article semantic elements). Use Chrome DevTools Elements panel to verify semantic structure. Test with screen reader: headings should be announced in order.",
+      "status": "in_progress",
+      "dependencies": [
+        {
+          "taskId": "485ed7b2-0c02-4df2-8363-7d0120b04423"
+        }
+      ],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:55:48.971Z",
       "relatedFiles": [
         {
           "path": "src/components/hero/HeroSection.astro",
           "type": "TO_MODIFY",
-          "description": "Add HeroParallax Island import and mount with client:idle, update styles for z-index layering"
-        }
-      ],
-      "implementationGuide": "1. Open src/components/hero/HeroSection.astro\n2. Import HeroParallax component: import HeroParallax from './HeroParallax'\n3. Add <HeroParallax client:idle /> inside .hero__inner div, positioned behind text\n4. Update .hero CSS to set position: relative and establish stacking context\n5. Style HeroParallax wrapper to position: absolute, inset: 0, z-index: 0\n6. Ensure text content gets z-index: 1 for layering\n7. Add container/wrapper div around HeroParallax if needed for positioning\n8. Test that mouse movement triggers parallax effect when Island loads\n9. Verify mobile layout: HeroParallax should be hidden on small screens or scale appropriately\n10. Check that scroll and parallax don't conflict",
-      "verificationCriteria": "HeroSection renders with HeroParallax Island. Mouse movement triggers parallax effect (visual inspection). No layout shift or FOUC. Mobile view correct (no parallax jank on small screens). Build succeeds (npm run build). Astro linter clean.",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation.",
-      "summary": "HeroParallax Island successfully integrated into HeroSection.astro with proper z-index layering (parallax z-index: 0, text z-index: 1). Component renders without errors with client:idle directive for non-blocking loading. Build passes (10 pages built in 4.26s). CSS vars (--mx, --my, --mx-pct, --my-pct, --mx-px, --my-px, --m-deg) ready for mouse tracking. SVG tree graphic renders correctly. RAF loop and event listener cleanup properly implemented. Mobile layout accommodates Island rendering.",
-      "completedAt": "2026-05-21T17:39:12.270Z"
-    },
-    {
-      "id": "6a897a6a-60f9-424d-ad19-7f50f92d64aa",
-      "name": "TASK-14.1: Create SearchOverlay.tsx Island component",
-      "description": "Create React Island component at src/components/ui/SearchOverlay.tsx that implements Cmd+K search modal. Renders full-viewport blur overlay with centered 600px max-width modal. Integrates searchPosts utility for score-based search. Manages localStorage recent searches (max 5 items). Implements keyboard navigation (↑↓ arrow keys to navigate results, Enter to select, Esc to close). Marks search term in results with HTML <mark> tag. Exports as Island for client:idle loading.",
-      "notes": "localStorage key: 'blog-recent-searches', format: JSON.stringify(string[]). Mark highlighting can use simple string replace or regex. Recent searches show when input empty. Results filtered by searchPosts score > 0. Selected result highlighted with blue background. Keyboard nav essential for accessibility.",
-      "status": "in_progress",
-      "dependencies": [],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:35:02.476Z",
-      "relatedFiles": [
+          "description": "Verify h1/h2 hierarchy and semantic elements (header/section)"
+        },
         {
-          "path": "src/components/ui/SearchOverlay.tsx",
-          "type": "CREATE",
-          "description": "React Island component for Cmd+K modal with search and keyboard navigation"
+          "path": "src/layouts/ArticleLayout.astro",
+          "type": "TO_MODIFY",
+          "description": "Add <main>, <article>, semantic elements; verify h1/h2 nesting"
+        },
+        {
+          "path": "src/pages/blog.astro",
+          "type": "TO_MODIFY",
+          "description": "Ensure blog page heading hierarchy and semantic structure"
         }
       ],
-      "implementationGuide": "1. Create file at src/components/ui/SearchOverlay.tsx\n2. Define interface SearchOverlayProps (receives onClose callback, allPosts: BlogPost[])\n3. Implement useState for: isOpen, query, results, selectedIndex, recentSearches\n4. Implement useEffect that:\n   - Loads recentSearches from localStorage on mount (key: 'blog-recent-searches')\n   - Parses JSON array, defaults to empty array\n5. Implement keydown listener for:\n   - 'Escape': close modal (setIsOpen(false))\n   - 'ArrowUp': selectedIndex-- (clamp to 0)\n   - 'ArrowDown': selectedIndex++ (clamp to results.length-1)\n   - 'Enter': navigate to selected result (window.location.href = ...)\n   - '/' (when modal closed): open modal (setIsOpen(true))\n6. Implement input onChange handler that calls searchPosts(allPosts, query)\n7. Implement recent search click handler that: sets query, executes search, saves to localStorage\n8. Implement saveSearch function: add query to recentSearches array, keep max 5, stringify to localStorage\n9. Create renderResults function that applies <mark>query</mark> tags to excerpt (use highlightText helper)\n10. Render full-viewport modal: overlay div with blur, centered 600px modal container\n11. Modal contains: input field, recent searches list, results list\n12. Results show: title, category badge, excerpt with mark, date, tags\n13. Add keyboard shortcuts hint (display '⌘K / Ctrl+K / /')\n14. Style with CSS container queries (no @media width queries)\n15. Export as default for Island mounting",
-      "verificationCriteria": "SearchOverlay renders on Cmd+K keypress. Input field accepts text and filters results. Recent searches persist to localStorage. Keyboard navigation (↑↓ Enter Esc) works correctly. Search term marked in results with <mark> tag. No console.log. TypeScript strict. Build passes. Linter clean. Mobile keyboard responsive.",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation."
+      "implementationGuide": "1. For HeroSection.astro:\n   a. Verify h1 exists (site title or hero headline).\n   b. If hero uses secondary headings, ensure h2 (not h3+).\n   c. Check markup: <header> or <section> wraps hero, <h1> inside.\n2. For ArticleLayout.astro:\n   a. Verify <main> wraps entire article content.\n   b. Article title should be h1 (or h2 if page-level h1 exists elsewhere).\n   c. Section headings (comments, related posts) should be h2.\n   d. Sub-sections h3, etc.\n   e. Check: <article>, <section>, <header>, <footer> semantic elements used appropriately.\n3. For pages (blog.astro, about.astro, etc.):\n   a. Ensure page heading is h1 or section title is h2 if site title is h1.\n   b. No heading skips (e.g., h1 → h3, missing h2).\n4. For Header navigation:\n   a. Wrap <nav> with aria-label=\"Primary\" (already present per code review).\n   b. Verify nav links are <a> elements with proper href (skip link support).\n5. Run axe DevTools after fixes: verify zero heading/heading_order violations.",
+      "verificationCriteria": "1. Single h1 per page (verified via axe heading checks).\n2. Heading hierarchy correct (h2 under h1, h3 under h2, no skips).\n3. Semantic elements present: <main> wraps main content, <article> for posts, <nav> for navigation, <section> for content blocks.\n4. Header <nav> has aria-label=\"Primary\".\n5. axe DevTools: zero heading/heading_order/landmark violations.\n6. Build passes: npm run build.\n7. Manual screen reader test: headings announced in order, landmarks identified.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
     },
     {
-      "id": "6a8a6e76-f9ec-4fc5-8112-b1db4fdd0f97",
-      "name": "TASK-14.2: Wire SearchOverlay Island to Header.astro",
-      "description": "Modify src/components/layout/Header.astro to mount SearchOverlay.tsx Island and wire Cmd+K button to trigger modal open. Update Header script to dispatch custom event or call Island directly when search button clicked. Ensure Island loads with client:idle and receives allPosts collection.",
-      "notes": "allPosts must be fetched in Header frontmatter and passed as prop to SearchOverlay Island. client:idle ensures modal loads deferred. Custom event approach: header dispatches 'open-search', Island listens and responds. Simpler: pass onOpen callback.",
+      "id": "f487a308-c83d-401a-a83c-7d6c4ef33b88",
+      "name": "TASK-18.3: Fix Color Contrast and Focus Indicators",
+      "description": "Audit and fix color contrast issues (target ≥4.5:1 for normal text, ≥3:1 for large text). Update CSS for interactive elements to include visible focus indicators (outline, ring, or custom styling). Verify no text/background color pairs violate WCAG AA. Focus indicators must be high contrast and visible (min 3px).",
+      "notes": "TailwindCSS focus variants: focus:ring-2 focus:ring-offset-2. Container queries may affect focus scope. Test with browser high contrast mode. Keyboard focus must be visible without color alone (shape/outline required).",
       "status": "pending",
       "dependencies": [
         {
-          "taskId": "6a897a6a-60f9-424d-ad19-7f50f92d64aa"
+          "taskId": "485ed7b2-0c02-4df2-8363-7d0120b04423"
         }
       ],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:34:25.558Z",
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:45:36.048Z",
+      "relatedFiles": [
+        {
+          "path": "src/styles/prose.css",
+          "type": "TO_MODIFY",
+          "description": "Update text/background contrast for article body",
+          "lineStart": 1,
+          "lineEnd": 100
+        },
+        {
+          "path": "src/styles/app.css",
+          "type": "REFERENCE",
+          "description": "Global styles (tokens immutable, check component-specific overrides)"
+        }
+      ],
+      "implementationGuide": "1. Use Chrome DevTools Inspect → Accessibility panel to identify contrast failures.\n2. For text elements:\n   a. Identify low-contrast pairs (e.g., light gray text on white, dark text on dark).\n   b. Check prose.css and component styles (TailwindCSS classes).\n   c. For dark mode, verify both light and dark contrast (toggle data-theme).\n   d. Update color utility classes (text-*, bg-*) to ensure sufficient contrast.\n3. For focus indicators:\n   a. Review interactive elements: <a>, <button>, <input>, <select>, etc.\n   b. Current focus styles likely use browser default (check CSS rules).\n   c. Add explicit focus styles: outline or box-shadow with high contrast.\n   d. Example: :focus { outline: 2px solid {high-contrast-color}; outline-offset: 2px; }\n   e. Or TailwindCSS: focus:outline-2 focus:outline-offset-2 focus:outline-{color}.\n4. Test:\n   a. Chrome DevTools Accessibility tab: verify contrast ratios ≥4.5:1 for normal, ≥3:1 for large.\n   b. Manual test: Tab through all pages, verify focus outline visible on every focused element.\n   c. High contrast mode (Windows Accessibility settings): verify focus still visible.\n5. Verify no inline styles conflict with focus CSS (PR.md rules forbid inline styles, but check).\n6. Run axe DevTools after fixes: zero color-contrast violations.",
+      "verificationCriteria": "1. All text color/background pairs: ≥4.5:1 contrast (normal text), ≥3:1 large text (≥18pt or ≥14pt bold).\n2. Chrome DevTools Accessibility panel reports zero contrast violations.\n3. Focus indicators visible on all interactive elements (outline, ring, or custom).\n4. Focus style consistent across all elements (light/dark mode).\n5. Keyboard Tab navigation: focus outline clearly visible, high contrast.\n6. axe DevTools: zero color-contrast violations.\n7. Build passes: npm run build.\n8. Manual test: high contrast mode enabled, focus still visible.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
+    },
+    {
+      "id": "ab3d6f12-3eb7-4558-95fb-09dbaa989a81",
+      "name": "TASK-18.4: Add ARIA Labels and Fix Button/Link Names",
+      "description": "Add aria-label to icon buttons (search, theme toggle, mobile menu). Add aria-label to interactive elements missing button names. Verify all <button> and <a> elements have accessible names (text content or aria-label). Update SearchOverlay, Header controls, and any form fields. Run axe button-name and link-name checks.",
+      "notes": "aria-label should be in Korean for Korean UI. Button names from text content (\"送信\" for submit button) or aria-label if icon-only. Link names from href title or text content. Use aria-current=\"page\" for active nav link. Test with screen reader (macOS VoiceOver).",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "485ed7b2-0c02-4df2-8363-7d0120b04423"
+        }
+      ],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:45:36.048Z",
       "relatedFiles": [
         {
           "path": "src/components/layout/Header.astro",
           "type": "TO_MODIFY",
-          "description": "Import SearchOverlay Island, fetch allPosts, wire Cmd+K button to modal trigger"
-        }
-      ],
-      "implementationGuide": "1. Open src/components/layout/Header.astro\n2. Add import for SearchOverlay: import SearchOverlay from '../ui/SearchOverlay'\n3. Get allPosts collection inside Header frontmatter: const allPosts = await getCollection('blog')\n4. Add <SearchOverlay client:idle allPosts={allPosts} /> before </header> closing tag\n5. Update Header script keydown listener (lines 52-57) to focus SearchOverlay input instead of clicking button\n6. Alternatively: dispatch custom event from header that SearchOverlay listens for\n7. Verify allPosts prop passes correctly from getCollection to Island\n8. Test that Cmd+K, Ctrl+K, and '/' all trigger modal\n9. Test modal close with Esc key\n10. Verify search functionality works end-to-end",
-      "verificationCriteria": "SearchOverlay Island mounts in Header. Cmd+K/Ctrl+K/slash opens modal. Modal closes with Esc. allPosts prop flows correctly. Search results display. Build succeeds. No TypeScript errors. Header still renders correctly. Mobile responsive.",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation."
-    },
-    {
-      "id": "7d553209-ecb7-493e-bc83-ee8fbac7f83e",
-      "name": "TASK-15.1: Create search.astro page with server-side rendering",
-      "description": "Create Astro page at src/pages/search.astro that renders search results as SSG. Parses ?q= searchParams from URL, executes searchPosts utility, displays results with mark highlighting. Shows TagCloud empty state when no results found. Reuses ListItem component for consistent styling. Implements container query responsive design (no @media width queries).",
-      "notes": "SSG page: renders at build time for each unique ?q= param. highlightText replaces instances of query with <mark>query</mark>. TagCloud empty state shows when no query or no results. ListItem reused directly, no modification. Container queries ensure mobile-first responsive design.",
-      "status": "in_progress",
-      "dependencies": [],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:35:03.283Z",
-      "relatedFiles": [
+          "description": "Add aria-label to icon buttons (search, theme, menu)",
+          "lineStart": 40,
+          "lineEnd": 55
+        },
         {
-          "path": "src/pages/search.astro",
-          "type": "CREATE",
-          "description": "SSG page for search results with mark highlighting and empty state"
+          "path": "src/components/ui/SearchOverlay.tsx",
+          "type": "TO_MODIFY",
+          "description": "Add aria-label, aria-live to search inputs and results"
         }
       ],
-      "implementationGuide": "1. Create file at src/pages/search.astro\n2. In frontmatter:\n   - Import BaseLayout, Header, Footer\n   - Import ListItem, TagCloud components\n   - Import searchPosts utility\n   - Import getCollection from 'astro:content'\n   - Get allPosts = await getCollection('blog')\n   - Get searchParams: const query = Astro.url.searchParams.get('q') || ''\n   - Execute search: const results = query ? searchPosts(allPosts, query) : []\n3. In template:\n   - Render BaseLayout with title 'Search Results'\n   - Add Header component\n   - Main section with:\n     - Search input field (prefilled with query value)\n     - Results count display: 'X results for \"query\"'\n     - If results.length > 0: render ListItem for each result with highlighting\n     - If results.length === 0 and query: show 'No results. Try different keywords.'\n     - If results.length === 0 and !query: show TagCloud from all posts\n   - Add Footer component\n4. Implement highlightText function or use regex to mark query in excerpts\n5. Style with container queries: @container app (max-width: Npx) pattern\n6. Add back link to blog list\n7. Test navigation from search modal results to this page\n8. Verify ?q= param parsed correctly",
-      "verificationCriteria": "Page renders at /search?q=test. Results display correctly with mark highlighting. Empty state shows TagCloud. ListItem styled consistently. Build succeeds (npm run build). No TypeScript errors. Mobile responsive (container queries). Navigating from SearchOverlay to results works. Back navigation to blog list works.",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation."
+      "implementationGuide": "1. For icon buttons in Header.astro:\n   a. Search button: add aria-label=\"검색\" (already present per code review, verify it's in template).\n   b. Theme toggle button: should have aria-label=\"테마 전환\" or similar.\n   c. Menu toggle (mobile): should have aria-label=\"메뉴\".\n2. For SearchOverlay.tsx:\n   a. Close button (if icon): aria-label=\"닫기\".\n   b. Search input field: <label> or aria-label=\"검색 쿼리\".\n   c. Search results: aria-live=\"polite\" to announce results.\n3. For navigation links:\n   a. Verify all <a> elements have text content or aria-label.\n   b. Check breadcrumbs if present: aria-label=\"경로\" or aria-current=\"page\".\n4. For form fields (if any):\n   a. All <input>, <select>, <textarea> must have associated <label> or aria-label.\n   b. Required fields should have aria-required=\"true\" (HTML5 required attribute preferred).\n   c. Error messages: associate with aria-describedby.\n5. Run axe DevTools: verify zero button-name and link-name violations.\n6. Manual testing: Tab through page, screen reader announces all button/link purposes.",
+      "verificationCriteria": "1. All icon buttons have aria-label (search: \"검색\", theme: \"테마 전환\", menu: \"메뉴\").\n2. axe DevTools button-name check: zero violations.\n3. All links have text content or aria-label.\n4. axe DevTools link-name check: zero violations.\n5. Search input has aria-label=\"검색 쿼리\" or associated <label>.\n6. Search results have aria-live=\"polite\" for live region announcement.\n7. Form fields (if any) have <label> or aria-label, aria-required.\n8. Manual screen reader test: all buttons/links announced with purpose.\n9. Build passes: npm run build.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
     },
     {
-      "id": "a1dc64ce-5bab-499f-b596-7e6174ef4bbf",
-      "name": "TASK-15.2: Add search results styling and mobile optimization",
-      "description": "Add CSS styles to src/pages/search.astro for search results layout. Ensure container query responsive design works on all breakpoints. Optimize mobile layout (single column, proper spacing). Add visual hierarchy for search input, results count, and result items. Ensure mark highlighting is visually distinct (yellow background or similar).",
-      "notes": "Container queries already established in app.css. Mark styling should be subtle (yellow bg, rounded corners). Mobile-first: base styles for mobile, add desktop enhancements in container queries. Dark theme: use CSS custom properties (--text-*, --surface-*, --c-*).",
+      "id": "77223a81-5c43-420c-8c23-8008b67edfde",
+      "name": "TASK-18.5: Test and Fix Keyboard Navigation",
+      "description": "Manually test keyboard navigation (Tab, Shift+Tab, Enter, Escape) on all pages. Verify no keyboard traps, logical Tab order, and all interactive elements reachable. Test mobile menu toggle, search overlay open/close, theme toggle, and article navigation. Verify skip links if implemented.",
+      "notes": "Tab order follows DOM order (CSS order doesn't matter). Use tabindex=\"-1\" to remove elements from Tab order (modals, disabled items). Use tabindex=\"0\" to add to Tab order (only if semantically justified). Escape key should close modals/overlays. Test on both macOS (VoiceOver) and Windows (Narrator or NVDA) if possible.",
       "status": "pending",
       "dependencies": [
         {
-          "taskId": "7d553209-ecb7-493e-bc83-ee8fbac7f83e"
+          "taskId": "485ed7b2-0c02-4df2-8363-7d0120b04423"
         }
       ],
-      "createdAt": "2026-05-21T17:34:25.558Z",
-      "updatedAt": "2026-05-21T17:34:25.558Z",
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:45:36.048Z",
       "relatedFiles": [
         {
-          "path": "src/pages/search.astro",
-          "type": "TO_MODIFY",
-          "description": "Add CSS styles for search results layout, mobile optimization, mark highlighting"
+          "path": "src/components/layout/Header.astro",
+          "type": "REFERENCE",
+          "description": "Header keyboard nav: Tab through navigation, theme toggle, search button"
+        },
+        {
+          "path": "src/components/layout/MobileMenu.astro",
+          "type": "REFERENCE",
+          "description": "Mobile menu Tab order and Escape key handling"
+        },
+        {
+          "path": "src/components/ui/SearchOverlay.tsx",
+          "type": "REFERENCE",
+          "description": "Search overlay Tab cycling and Escape key"
         }
       ],
-      "implementationGuide": "1. Add <style> block to src/pages/search.astro\n2. Define .search-container with container query pattern: @container app (max-width: 640px) { ... }\n3. Style .search-header with search input, results count\n4. Style .search-input: inherit from app.css button styles, add focus states\n5. Style .search-results: list layout, spacing between items\n6. Style .search-empty-state: centered message, TagCloud below\n7. Style <mark> tag: background-color var(--c-yellow-50, #fbbf24), padding, border-radius\n8. Mobile optimization:\n   - Single column layout\n   - Full-width search input\n   - Proper padding/spacing\n   - No horizontal scroll\n9. Dark theme support: ensure styles respect data-theme attribute\n10. Add transitions for hover states on results\n11. Test on mobile, tablet, desktop viewports",
-      "verificationCriteria": "Search results styled consistently. Mark highlighting visible and readable. Mobile layout single column, no horizontal scroll. Tablet/desktop layout expanded properly via container queries. Dark theme colors correct. Hover states smooth. Build succeeds. Linter clean.",
-      "analysisResult": "Phase 1 implements three interactive features for the Astro blog (TASK-13, TASK-14, TASK-15) by leveraging Phase 0 completions. All tasks integrate with existing components (HeroSection, Header, ListItem, TagCloud) and utilities (searchPosts). No architectural conflicts or premature abstractions. Design follows established patterns: Astro Islands with client:idle, CSS custom properties, container queries, TypeScript strict mode, zod validation."
+      "implementationGuide": "1. Start development server: npm run dev.\n2. Open each page (home, blog, about, blog post).\n3. For keyboard navigation:\n   a. Press Tab repeatedly: verify focus moves through all interactive elements in logical order.\n   b. Press Shift+Tab: verify focus moves backward correctly.\n   c. For buttons: press Enter or Space to activate (both should work).\n   d. For links: press Enter to follow.\n   e. For text inputs: Tab to focus, type to enter text, Tab to next element.\n4. For specific interactions:\n   a. Mobile menu: Tab to menu button, press Enter to open, Tab through menu items, press Escape to close.\n   b. Search overlay: Tab to search button, press Enter/⌘K to open, Tab to close button, press Escape to close.\n   c. Theme toggle: Tab to toggle, press Space/Enter to switch theme, verify data-theme changes.\n5. Verify no focus traps:\n   a. Tab should eventually reach end of page and cycle back to beginning.\n   b. Overlay (search, mobile menu): Tab should cycle within overlay when open, Escape should close.\n6. Test on all pages and verify Tab order is intuitive (header → main content → footer).\n7. Manual test with screen reader (macOS VoiceOver):\n   a. Turn on VoiceOver: Cmd+F5.\n   b. Navigate with VO+Right arrow through headings, buttons, links.\n   c. Verify announcements make sense (button name, link destination, etc.).\n   d. Turn off: Cmd+F5.\n8. Document any focus order issues and fix before marking complete.",
+      "verificationCriteria": "1. Tab navigation works on all pages (home, blog, about, blog post).\n2. Tab order logical: header → main content → footer (no jumping around).\n3. No keyboard traps (Tab eventually cycles through all elements).\n4. Enter/Space activates buttons, Enter follows links.\n5. Mobile menu: Tab to button, Enter opens, Tab through items, Escape closes.\n6. Search overlay: Tab to search, ⌘K/Enter opens, Tab cycles, Escape closes.\n7. Theme toggle: Tab to button, Space/Enter switches theme and data-theme attribute.\n8. Manual screen reader test: VoiceOver/Narrator announces all elements correctly.\n9. Focus order matches DOM order (no tabindex conflicts).\n10. No console errors during keyboard navigation testing.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
+    },
+    {
+      "id": "8cf6ee58-362c-4362-a34d-8d4fe98f4a43",
+      "name": "TASK-19.1: Optimize Images and CSS Bundle",
+      "description": "Optimize all images for web delivery (WebP format, responsive srcset, lazy-loading). Remove unused CSS from Tailwind build (tree-shake). Verify bundle size reduction. Measure Lighthouse Performance score (target ≥95).",
+      "notes": "WebP is supported in all modern browsers; fallback to JPG for IE11 (not required for this project). Lighthouse score varies by network/device; multiple runs may show variance. Target 95+ is aspirational; 90+ is acceptable. Giscus iframe may impact Performance score (third-party); Lighthouse will flag but it's acceptable for features.",
+      "status": "in_progress",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T18:03:23.427Z",
+      "relatedFiles": [
+        {
+          "path": "src",
+          "type": "REFERENCE",
+          "description": "All components with images to optimize"
+        },
+        {
+          "path": "astro.config.mjs",
+          "type": "REFERENCE",
+          "description": "Astro config for build optimization settings"
+        }
+      ],
+      "implementationGuide": "1. Image optimization:\n   a. Convert all PNG/JPG to WebP format (use online converter or Sharp in build process).\n   b. For responsive images, create multiple sizes (mobile: 400w, tablet: 800w, desktop: 1200w).\n   c. Use <picture> element with WebP + fallback: <picture><source srcset=\"image.webp\" type=\"image/webp\"><img src=\"image.jpg\" alt=\"...\"></picture>.\n   d. Add loading=\"lazy\" to off-viewport images (hero parallax can be eager).\n   e. Add decoding=\"async\" to prevent render-blocking.\n2. CSS optimization:\n   a. Check Tailwind config: purge or safelist excludes unused patterns.\n   b. Run: npm run build -- --analyze (if available) to check CSS size.\n   c. Verify no redundant CSS classes (DRY principle).\n   d. Check prose.css and app.css for unused styles (read-only, but review for cleanup candidates).\n3. Bundle analysis:\n   a. After build: npm run build && du -sh dist/ to check dist folder size.\n   b. Use Chrome DevTools Coverage tab: open dist files in browser, verify low unused bytes.\n4. Lighthouse measurement:\n   a. Run: npm run build && npm run preview.\n   b. Open Chrome DevTools → Lighthouse → Performance audit (throttle to 4G, slow CPU for realistic).\n   c. Target: ≥95 Performance score.\n   d. Check metrics: First Contentful Paint (FCP), Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS).\n5. If score <95:\n   a. Check DevTools Performance tab for bottlenecks.\n   b. Reduce JavaScript: defer non-critical client:idle Islands.\n   c. Optimize fonts: system-ui or preload web fonts (check if any Google Fonts used).\n   d. Minimize Third-party scripts: Giscus, analytics (if added).\n6. Test on real device if possible (DevTools throttling may underestimate real-world performance).",
+      "verificationCriteria": "1. All images converted to WebP with JPG fallbacks (if applicable).\n2. Images use responsive srcset for multiple device sizes.\n3. Off-viewport images have loading=\"lazy\" (hero can be eager).\n4. CSS bundle size reduced (check dist/assets size after build).\n5. Lighthouse Performance score ≥95 (or ≥90 if Giscus/third-party impacts).\n6. Metrics target: FCP <1.8s, LCP <2.5s, CLS <0.1.\n7. No JavaScript render-blocking (scripts deferred or async).\n8. Build succeeds: npm run build with no errors.\n9. Preview runs without performance warnings: npm run preview.",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
+    },
+    {
+      "id": "34038829-a841-42b7-a124-8cdbe8d15b78",
+      "name": "TASK-19.2: Verify Lighthouse Scores for All Audits",
+      "description": "Run full Lighthouse audit (Performance, Accessibility, Best Practices, SEO) on all major pages (home, blog, about, blog post example). Verify all scores ≥90, with Performance ≥95. Document scores and fix any remaining issues.",
+      "notes": "Lighthouse scores fluctuate based on network/device; run 3 times and average. Chrome DevTools Lighthouse is cached; clear cache (⌘⇧Delete) between runs for clean results. Focus on metric improvements (FCP, LCP, CLS) rather than score variance. Giscus iframe may impact scores but is acceptable for feature value.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "8cf6ee58-362c-4362-a34d-8d4fe98f4a43"
+        }
+      ],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:45:36.048Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/index.astro",
+          "type": "REFERENCE",
+          "description": "Home page for Lighthouse audit"
+        },
+        {
+          "path": "src/pages/blog.astro",
+          "type": "REFERENCE",
+          "description": "Blog listing page for Lighthouse audit"
+        }
+      ],
+      "implementationGuide": "1. Build and preview: npm run build && npm run preview.\n2. Open Chrome and navigate to localhost (preview URL).\n3. For each page (home, /blog, /about, /blog/[slug]):\n   a. Open Chrome DevTools → Lighthouse tab.\n   b. Select audit categories: Performance, Accessibility, Best Practices, SEO.\n   c. Set throttling: 4G (slow), CPU 4x slowdown (simulates mobile).\n   d. Click \"Analyze page load\".\n   e. Screenshot or export report (Lighthouse → Generate Report).\n   f. Record scores: Performance, Accessibility, Best Practices, SEO.\n4. Target scores:\n   - Performance ≥95\n   - Accessibility ≥95 (should be after WCAG fixes)\n   - Best Practices ≥95\n   - SEO ≥95 (should be after SEO setup)\n5. If any score <90:\n   a. Review Lighthouse suggestions (Opportunities and Diagnostics).\n   b. Fix highest-impact issues first (prioritize by savings in seconds).\n   c. Re-audit after fixes.\n6. Document final scores in a summary (not committed, reference only).",
+      "verificationCriteria": "1. Lighthouse audit completed on all major pages (home, blog, about, blog post).\n2. Performance score ≥95 on all pages.\n3. Accessibility score ≥95 on all pages (after WCAG 2.1 AA fixes).\n4. Best Practices score ≥90 on all pages.\n5. SEO score ≥95 on all pages (after SEO infrastructure).\n6. All metrics within targets: FCP <1.8s, LCP <2.5s, CLS <0.1, TTI <3.8s.\n7. No Lighthouse errors or critical warnings.\n8. Scores documented (screenshot or export, not committed).",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
+    },
+    {
+      "id": "1001b11c-5bd5-4be7-a638-ddd89124420f",
+      "name": "TASK-20.1: Create Vercel Deployment Configuration",
+      "description": "Set up Vercel deployment infrastructure: vercel.json configuration file, environment variables setup, build and output settings, custom domain configuration (if applicable). Configure GitHub integration for preview deployments and CI/CD automation.",
+      "notes": "vercel.json must be in root (alongside package.json). Environment variables must be available at build time (used by Astro at build). Giscus requires GISCUS_REPO (owner/repo format). GitHub integration auto-triggers on push; no additional CI/CD setup needed. Preview deployments on PRs help catch issues before merge.",
+      "status": "in_progress",
+      "dependencies": [],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T18:03:24.293Z",
+      "relatedFiles": [
+        {
+          "path": "vercel.json",
+          "type": "CREATE",
+          "description": "Vercel deployment configuration"
+        },
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "Environment variables template (not committed, for reference)"
+        }
+      ],
+      "implementationGuide": "1. Create vercel.json in project root:\n   a. buildCommand: \"npm run build\" (Astro build).\n   b. outputDirectory: \"dist\" (Astro output).\n   c. framework: \"astro\" (optional, Vercel auto-detects but explicit is clearer).\n   d. env: {GISCUS_REPO: {value: \"{repo}\", required: true}, ...}.\n   e. redirects: add any legacy URL redirects if needed.\n   f. headers: Cache-Control for static assets, CSP for security.\n2. Environment variables:\n   a. Identify required vars: GISCUS_REPO, GISCUS_REPO_ID, GISCUS_CATEGORY_ID (from GitHub repository setup).\n   b. In Vercel dashboard (Settings → Environment Variables), add each var with production/preview/development scope.\n   c. Or add to .env.local (not committed): GISCUS_REPO=owner/repo, etc.\n3. GitHub integration:\n   a. Connect repository to Vercel (via vercel.com/dashboard).\n   b. Enable preview deployments on pull requests (automatic).\n   c. Enable production deployment on main branch push (automatic).\n   d. Set preview/production environment variables in Vercel UI.\n4. Build optimization in vercel.json:\n   a. Specify Node version: {\"nodeVersion\": \"20.x\"} (match package.json engines if specified).\n   b. Specify functions region if needed (default: auto).\n5. Custom domain (if applicable):\n   a. In Vercel dashboard: Settings → Domains.\n   b. Add domain (e.g., hongmacho-blog.com).\n   c. Update DNS records (CNAME or A record) to point to Vercel.\n6. Test: Push a commit to main branch, verify Vercel starts deployment automatically.",
+      "verificationCriteria": "1. vercel.json exists in project root with correct buildCommand, outputDirectory, framework.\n2. Environment variables configured in Vercel dashboard (GISCUS_REPO, etc.).\n3. GitHub repository connected to Vercel (Settings → GitHub in Vercel dashboard).\n4. Push to main branch triggers deployment (verify in Vercel dashboard Deployments tab).\n5. Preview deployments work on PRs (if applicable).\n6. Build succeeds on Vercel (check deployment logs).\n7. Site accessible at Vercel domain (*.vercel.app).\n8. Custom domain pointing to Vercel (if configured).\n9. Environment variables available in production (verify Astro can access them at build time).",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
+    },
+    {
+      "id": "3c560838-2335-4b17-96dd-901fff494cf2",
+      "name": "TASK-20.2: Test Production Build and Deployment",
+      "description": "Verify production build succeeds locally, test all pages and features on preview deployment, verify performance and SEO meta tags in production. Ensure no broken links, missing assets, or runtime errors.",
+      "notes": "Local build and Vercel build may differ due to Node version or env vars. Vercel logs available in dashboard (Deployments → logs) if build fails. Network conditions in Lighthouse on preview may show different scores than local (real network vs. local). Giscus comments won't show on preview until repo is published and discussions enabled. Test with real GitHub account if possible.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "1001b11c-5bd5-4be7-a638-ddd89124420f"
+        }
+      ],
+      "createdAt": "2026-05-21T17:45:36.048Z",
+      "updatedAt": "2026-05-21T17:45:36.048Z",
+      "relatedFiles": [
+        {
+          "path": "dist",
+          "type": "REFERENCE",
+          "description": "Production build output directory (generated, not committed)"
+        }
+      ],
+      "implementationGuide": "1. Local production build:\n   a. Run: npm run build (should complete without errors).\n   b. Check dist/ folder exists and contains all assets (check file count, size).\n   c. Verify dist/index.html, dist/blog.html exist.\n2. Local preview:\n   a. Run: npm run preview.\n   b. Open http://localhost:3000 (verify port in preview output).\n   c. Manual testing:\n      i. Navigate all pages: home, /blog, /about, blog posts.\n      ii. Click all links, verify no 404s.\n      iii. Test theme toggle: verify data-theme switches, colors update.\n      iv. Test search: open search modal (⌘K), type, verify results.\n      v. Test mobile view: DevTools device emulation (mobile phone), verify responsive.\n      vi. Scroll to blog post: verify comments section loads (Giscus Island).\n      vii. Check page source: verify meta tags (og:title, og:description, canonical, JSON-LD).\n3. Vercel preview deployment:\n   a. Push changes to main (or create PR) → Vercel auto-deploys.\n   b. Open Vercel deployment URL (e.g., hongmacho-blog-*.vercel.app).\n   c. Repeat manual testing above.\n   d. Test performance: Chrome DevTools Lighthouse audit on preview URL (may differ from local).\n4. Verify no broken assets:\n   a. Chrome DevTools Network tab: check for 404 responses.\n   b. Console: no errors or warnings (except expected third-party like Giscus).\n5. Verify SEO:\n   a. Open page source (View Page Source): check <meta> tags, <script type=\"application/ld+json\">.\n   b. Use SEO checker: check robots.txt (/robots.txt), sitemap.xml (/sitemap.xml).\n   c. Verify RSS feed: /feed.xml accessible and valid XML.\n6. Check Lighthouse on Vercel:\n   a. Run Lighthouse audit on Vercel deployment URL (may be different from local).\n   b. Verify scores still ≥90 on preview.\n7. If issues found, fix and re-deploy (push to main or update PR).",
+      "verificationCriteria": "1. Local production build succeeds: npm run build exits with code 0.\n2. dist/ folder contains all pages and assets (no missing files).\n3. Local preview runs: npm run preview works on localhost.\n4. All pages accessible and functional (home, blog, about, posts).\n5. No broken links (all hrefs resolve).\n6. Theme toggle works (data-theme switches, colors update).\n7. Search modal opens/closes (⌘K or search button).\n8. Mobile responsive (DevTools device emulation).\n9. Meta tags present in page source (og:*, canonical, JSON-LD).\n10. Robots.txt and sitemap.xml accessible and valid.\n11. RSS feed accessible and valid XML (/feed.xml).\n12. Vercel deployment succeeds (Deployments tab shows successful build).\n13. Vercel preview URL accessible and functional.\n14. No console errors on preview.\n15. Lighthouse audit on Vercel: Performance ≥90, Accessibility ≥90, SEO ≥90 (may differ from local).",
+      "analysisResult": "Phase 2: SEO Infrastructure, Comments System, Accessibility Compliance, Performance Optimization, Vercel Deployment. Execution order: SEO (independent) → Giscus (depends on BaseLayout) → A11y fixes (spans all components) → Performance tuning (final optimization) → Deployment config (final infrastructure). All tasks use existing BaseLayout, ArticleLayout, and Design token patterns. No new abstractions introduced. TypeScript strict mode, TailwindCSS + container queries, React Islands with client:visible/client:idle directives."
     }
   ]
 }

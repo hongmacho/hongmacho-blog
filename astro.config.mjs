@@ -13,4 +13,8 @@ export default defineConfig({
       wrap: true,
     },
   },
+  compressHTML: true,
+  prefetch: {
+    defaultStrategy: 'tap',
+  },
 });

@@ -132,7 +132,7 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
   return (
     <div className="search-overlay">
       <div className="search-overlay__backdrop" onClick={() => setIsOpen(false)} />
-      <div className="search-overlay__modal">
+      <div className="search-overlay__modal" role="dialog" aria-modal="true" aria-label="Search posts">
         <div className="search-overlay__header">
           <input
             ref={inputRef}
@@ -142,6 +142,7 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
             onChange={(e) => handleSearch(e.target.value)}
             onKeyDown={handleKeyDown}
             className="search-overlay__input"
+            aria-label="Search posts"
           />
           <button
             onClick={() => setIsOpen(false)}
