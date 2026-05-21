@@ -1,0 +1,86 @@
+/* ──────────────────────────────────────────────────────────────────
+   Wanted Design System — typefaces
+   ──────────────────────────────────────────────────────────────────
+   Primary:  Pretendard JP   (Korean/Japanese/Latin sans)
+   Display:  Wanted Sans     (bespoke display family)
+   Mono:     SF Mono / system mono
+
+   This file first declares @font-face for the real Wanted typefaces
+   (looking inside fonts/), then imports Google Fonts fallbacks so
+   the system renders correctly even if the real .woff2 files aren't
+   present yet. Drop Pretendard‑JP & Wanted Sans woff2 files into
+   fonts/ to upgrade automatically.
+   ──────────────────────────────────────────────────────────────────*/
+
+/* Fallback imports — Noto Sans KR is the closest open‑source CJK
+   match to Pretendard JP; Inter is the closest match for Wanted Sans. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* Real fonts (will load from fonts/ if present). Place files as:
+     fonts/PretendardJP-Regular.woff2
+     fonts/PretendardJP-Medium.woff2
+     fonts/PretendardJP-SemiBold.woff2
+     fonts/PretendardJP-Bold.woff2
+     fonts/WantedSans-Regular.woff2
+     fonts/WantedSans-SemiBold.woff2
+     fonts/WantedSans-Bold.woff2
+     fonts/WantedSansVariable.woff2
+*/
+
+@font-face {
+  font-family: "Pretendard JP";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/PretendardJP-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Pretendard JP";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/PretendardJP-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Pretendard JP";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/PretendardJP-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Pretendard JP";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/PretendardJP-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Wanted Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/WantedSans-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Wanted Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/WantedSans-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Wanted Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/WantedSans-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Wanted Sans Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/WantedSansVariable.woff2") format("woff2-variations");
+}
