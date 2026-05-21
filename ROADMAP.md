@@ -21,7 +21,7 @@
 
 ---
 
-### TASK-01: 프로젝트 스캐폴딩
+### TASK-01: 프로젝트 스캐폴딩 ✓ COMPLETED
 
 **설명:**  
 Astro 6.3.6 + TailwindCSS 4.3.0 + TypeScript 6.0.3 프로젝트를 생성한다.  
@@ -55,7 +55,7 @@ typescript@6.0.3
 
 ---
 
-### TASK-02: 디자인 토큰 이식
+### TASK-02: 디자인 토큰 이식 ✓ COMPLETED
 
 **설명:**  
 `ui_design_prd/design_reference/styles/wds-tokens.css`와 `app.css`를 Astro 프로젝트의 글로벌 스타일로 이식한다.  
@@ -83,7 +83,7 @@ typescript@6.0.3
 
 ---
 
-### TASK-03: BaseLayout 구현
+### TASK-03: BaseLayout 구현 ✓ COMPLETED
 
 **설명:**  
 모든 페이지의 HTML 골격. 테마 초기화(깜빡임 방지), 폰트 로드, `--content-width` CSS var 초기화를 담당한다.
@@ -116,7 +116,7 @@ typescript@6.0.3
 
 ---
 
-### TASK-04: Atom 컴포넌트 구현
+### TASK-04: Atom 컴포넌트 구현 ✓ COMPLETED
 
 **설명:**  
 재사용 가능한 최소 단위 UI 컴포넌트 4종을 구현한다.  
@@ -157,7 +157,7 @@ typescript@6.0.3
 
 ---
 
-### TASK-05: Header 컴포넌트 구현
+### TASK-05: Header 컴포넌트 구현 ✓ COMPLETED
 
 **설명:**  
 sticky + frosted glass 헤더. 스크롤 8px 이상 시 hairline border 등장. ≤720px에서 햄버거 메뉴로 전환.  
@@ -193,7 +193,7 @@ sticky + frosted glass 헤더. 스크롤 8px 이상 시 hairline border 등장. 
 
 ---
 
-### TASK-06: Footer 컴포넌트 구현
+### TASK-06: Footer 컴포넌트 구현 ✓ COMPLETED
 
 **설명:**  
 3칸 그리드 푸터 (1.4fr / 1fr / 1fr). ≤768px에서 1칸.  
@@ -219,7 +219,7 @@ sticky + frosted glass 헤더. 스크롤 8px 이상 시 hairline border 등장. 
 
 ---
 
-### TASK-07: Content Collection 설정 + 샘플 포스트
+### TASK-07: Content Collection 설정 + 샘플 포스트 ✓ COMPLETED
 
 **설명:**  
 Astro Content Collections API로 블로그 포스트 스키마를 정의하고, 샘플 포스트 5개를 작성한다.
@@ -265,7 +265,7 @@ export const collections = { blog }
 
 ---
 
-### TASK-08: 유틸리티 라이브러리 구현
+### TASK-08: 유틸리티 라이브러리 구현 ✓ COMPLETED
 
 **설명:**  
 공통 유틸리티 함수 구현.
@@ -431,7 +431,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-12: About + 404 페이지 구현
+### TASK-12: About + 404 페이지 구현 ✓ COMPLETED
 
 **설명:**  
 소개 페이지와 Not Found 페이지 구현.
@@ -502,7 +502,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-14: Cmd+K 검색 모달 구현
+### TASK-14: Cmd+K 검색 모달 구현 ✓ COMPLETED
 
 **설명:**  
 전역 검색 오버레이. `⌘K` / `Ctrl+K` / `/` 트리거. 스코어 기반 실시간 검색.  
@@ -562,7 +562,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-16: SEO + Meta 태그 완성
+### TASK-16: SEO + Meta 태그 완성 ✓ COMPLETED
 
 **설명:**  
 모든 페이지에 Open Graph, Twitter Card, Schema.org, Canonical URL 추가.
@@ -589,7 +589,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-17: Giscus 댓글 통합
+### TASK-17: Giscus 댓글 통합 ✓ COMPLETED
 
 **설명:**  
 GitHub Discussions 기반 댓글 시스템. Article 페이지 하단에 삽입.
@@ -611,7 +611,7 @@ GitHub Discussions 기반 댓글 시스템. Article 페이지 하단에 삽입.
 
 ---
 
-### TASK-18: 접근성 감사 & 수정
+### TASK-18: 접근성 감사 ### TASK-18: 접근성 감사 & 수정 수정 ✓ COMPLETED
 
 **설명:**  
 WCAG 2.1 AA 기준으로 전체 접근성 검토.
@@ -634,7 +634,7 @@ WCAG 2.1 AA 기준으로 전체 접근성 검토.
 
 ---
 
-### TASK-19: 성능 최적화 & Lighthouse 검증
+### TASK-19: 성능 최적화 ### TASK-19: 성능 최적화 & Lighthouse 검증 Lighthouse 검증 ✓ COMPLETED
 
 **설명:**  
 번들 크기 목표 달성 및 Core Web Vitals 최적화.
@@ -660,7 +660,7 @@ WCAG 2.1 AA 기준으로 전체 접근성 검토.
 
 ---
 
-### TASK-20: Vercel 배포 설정
+### TASK-20: Vercel 배포 설정 ✓ COMPLETED
 
 **설명:**  
 GitHub 연동 + Vercel 자동 배포 설정.
