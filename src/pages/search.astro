@@ -49,7 +49,7 @@ const resultEntries = allPosts.filter((post) => results.some((r) => r.id === pos
 
 <BaseLayout title={`Search Results${query ? ` for "${query}"` : ''}`} description="Search blog posts">
   <Header />
-  <main class="search-page">
+  <main class="search-page" id="main-content">
     <div class="container search-page__inner">
       <div class="search-page__header">
         <h1 class="search-page__title">Search Results</h1>

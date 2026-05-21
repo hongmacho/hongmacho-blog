@@ -471,6 +471,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ### TASK-13: Hero `tree` 변형 + 마우스 패럴렉스 Island ✓ COMPLETED
 
+
 **설명:**  
 `tree` 변형 Hero 배경을 React Island로 구현한다.  
 디자인 레퍼런스: `ui_design_prd/design_reference/src/hero-variants.jsx`의 `HeroTree` 컴포넌트를 참고한다.

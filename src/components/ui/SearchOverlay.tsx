@@ -22,6 +22,7 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Load recent searches from localStorage on mount
   useEffect(() => {
@@ -95,6 +96,26 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
     setSelectedIndex(0);
   };
 
+  // Focus trap: keep focus inside modal when open
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+    const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const focusable = Array.from(modalRef.current.querySelectorAll<HTMLElement>(focusableSelectors));
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', trap);
+    return () => document.removeEventListener('keydown', trap);
+  }, [isOpen]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setIsOpen(false);
@@ -132,22 +153,22 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
   return (
     <div className="search-overlay">
       <div className="search-overlay__backdrop" onClick={() => setIsOpen(false)} />
-      <div className="search-overlay__modal" role="dialog" aria-modal="true" aria-label="Search posts">
+      <div ref={modalRef} className="search-overlay__modal" role="dialog" aria-modal="true" aria-label="포스트 검색">
         <div className="search-overlay__header">
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search posts..."
+            placeholder="포스트 검색..."
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
             onKeyDown={handleKeyDown}
             className="search-overlay__input"
-            aria-label="Search posts"
+            aria-label="포스트 검색"
           />
           <button
             onClick={() => setIsOpen(false)}
             className="search-overlay__close"
-            aria-label="Close search"
+            aria-label="검색 닫기"
           >
             <svg
               width="18"
@@ -165,10 +186,10 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
           </button>
         </div>
 
-        <div className="search-overlay__body" ref={resultsContainerRef}>
+        <div className="search-overlay__body" ref={resultsContainerRef} aria-live="polite" aria-atomic="false">
           {query.trim() === '' ? (
             <div className="search-overlay__section">
-              <div className="search-overlay__section-title">Recent Searches</div>
+              <div className="search-overlay__section-title">최근 검색어</div>
               {recentSearches.length > 0 ? (
                 <ul className="search-overlay__list">
                   {recentSearches.map((recentQuery, index) => (
@@ -198,13 +219,13 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
                   ))}
                 </ul>
               ) : (
-                <p className="search-overlay__empty">No recent searches</p>
+                <p className="search-overlay__empty">최근 검색어가 없습니다</p>
               )}
             </div>
           ) : results.length > 0 ? (
             <div className="search-overlay__section">
               <div className="search-overlay__section-title">
-                {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
+                &quot;{query}&quot; 검색 결과 {results.length}건
               </div>
               <ul className="search-overlay__list">
                 {results.map((post, index) => (
@@ -244,8 +265,8 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
             </div>
           ) : (
             <div className="search-overlay__empty-state">
-              <p>No results found for &quot;{query}&quot;</p>
-              <p className="search-overlay__empty-hint">Try different keywords</p>
+              <p>&quot;{query}&quot;에 대한 검색 결과가 없습니다</p>
+              <p className="search-overlay__empty-hint">다른 키워드로 검색해 보세요</p>
             </div>
           )}
         </div>
@@ -253,13 +274,13 @@ export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
         <div className="search-overlay__footer">
           <div className="search-overlay__shortcuts">
             <span className="search-overlay__shortcut">
-              <kbd>↑↓</kbd> Navigate
+              <kbd>↑↓</kbd> 탐색
             </span>
             <span className="search-overlay__shortcut">
-              <kbd>Enter</kbd> Select
+              <kbd>Enter</kbd> 선택
             </span>
             <span className="search-overlay__shortcut">
-              <kbd>Esc</kbd> Close
+              <kbd>Esc</kbd> 닫기
             </span>
           </div>
         </div>

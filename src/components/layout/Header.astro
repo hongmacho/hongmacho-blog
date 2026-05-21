@@ -34,9 +34,9 @@ const blogPosts = allPosts.map((post) => ({
     </a>
 
     <nav class="site-nav" aria-label="Primary">
-      <a href="/" class:list={['site-nav__link', { 'is-active': isActive('/') }]}>홈</a>
-      <a href="/blog" class:list={['site-nav__link', { 'is-active': isActive('/blog') }]}>블로그</a>
-      <a href="/about" class:list={['site-nav__link', { 'is-active': isActive('/about') }]}>소개</a>
+      <a href="/" class:list={['site-nav__link', { 'is-active': isActive('/') }]} aria-current={isActive('/') ? 'page' : undefined}>홈</a>
+      <a href="/blog" class:list={['site-nav__link', { 'is-active': isActive('/blog') }]} aria-current={isActive('/blog') ? 'page' : undefined}>블로그</a>
+      <a href="/about" class:list={['site-nav__link', { 'is-active': isActive('/about') }]} aria-current={isActive('/about') ? 'page' : undefined}>소개</a>
 
       <div class="site-header__tools">
         <button class="icon-btn" id="search-open-btn" aria-label="검색" title="검색 (⌘K)">

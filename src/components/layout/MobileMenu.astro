@@ -18,9 +18,9 @@ const isActive = (path: string) =>
   </button>
 
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation" hidden>
-    <a href="/" class:list={['mobile-nav__link', { 'is-active': isActive('/') }]}>홈</a>
-    <a href="/blog" class:list={['mobile-nav__link', { 'is-active': isActive('/blog') }]}>블로그</a>
-    <a href="/about" class:list={['mobile-nav__link', { 'is-active': isActive('/about') }]}>소개</a>
+    <a href="/" class:list={['mobile-nav__link', { 'is-active': isActive('/') }]} aria-current={isActive('/') ? 'page' : undefined}>홈</a>
+    <a href="/blog" class:list={['mobile-nav__link', { 'is-active': isActive('/blog') }]} aria-current={isActive('/blog') ? 'page' : undefined}>블로그</a>
+    <a href="/about" class:list={['mobile-nav__link', { 'is-active': isActive('/about') }]} aria-current={isActive('/about') ? 'page' : undefined}>소개</a>
   </nav>
 </div>
 
@@ -32,5 +32,13 @@ const isActive = (path: string) =>
     const expanded = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!expanded));
     if (nav) nav.hidden = expanded;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && btn?.getAttribute('aria-expanded') === 'true') {
+      btn.setAttribute('aria-expanded', 'false');
+      if (nav) nav.hidden = true;
+      btn.focus();
+    }
   });
 </script>
