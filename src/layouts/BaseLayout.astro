@@ -1,5 +1,7 @@
 ---
 import SEOHead from '../components/layout/SEOHead.astro';
+import '../styles/tokens.css';
+import '../styles/app.css';
 
 interface Props {
   title: string;
@@ -51,8 +53,8 @@ const {
       rel="stylesheet"
     />
 
-    <!-- Global styles -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <title>{title}</title>
 

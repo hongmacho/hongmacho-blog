@@ -306,7 +306,7 @@ export const collections = { blog }
 
 ---
 
-### TASK-09: 홈 페이지 구현 (`/`)
+### TASK-09: 홈 페이지 구현 (`/`) ✓ COMPLETED
 
 **설명:**  
 Hero 섹션 + 카테고리 섹션 + 최신 글 3개 섹션으로 구성된 홈 페이지.  
@@ -353,7 +353,7 @@ Hero는 정적 `aurora` 변형 1개로 시작 (Phase 1에서 `tree`로 교체).
 
 ---
 
-### TASK-10: Blog List 페이지 구현 (`/blog`)
+### TASK-10: Blog List 페이지 구현 (`/blog`) ✓ COMPLETED
 
 **설명:**  
 2-칸 레이아웃(사이드바 220px + 목록). 카테고리/태그 필터를 URL 파라미터로 관리.
@@ -390,7 +390,7 @@ Hero는 정적 `aurora` 변형 1개로 시작 (Phase 1에서 `tree`로 교체).
 
 ---
 
-### TASK-11: Article 페이지 구현 (`/blog/[slug]`)
+### TASK-11: Article 페이지 구현 (`/blog/[slug]`) ✓ COMPLETED
 
 **설명:**  
 TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 완전 구현.
@@ -532,7 +532,7 @@ TOC(220px) + 본문(`var(--content-width)`) 2-칸 레이아웃. Prose 스타일 
 
 ---
 
-### TASK-15: 검색 결과 페이지 구현 (`/search`)
+### TASK-15: 검색 결과 페이지 구현 (`/search`) ✓ COMPLETED
 
 **설명:**  
 `/search?q=` 검색 결과 전용 페이지.
@@ -611,7 +611,7 @@ GitHub Discussions 기반 댓글 시스템. Article 페이지 하단에 삽입.
 
 ---
 
-### TASK-18: 접근성 감사 ### TASK-18: 접근성 감사 & 수정 수정 ✓ COMPLETED
+### TASK-18: 접근성 감사 & 수정 ✓ COMPLETED
 
 **설명:**  
 WCAG 2.1 AA 기준으로 전체 접근성 검토.
@@ -634,7 +634,7 @@ WCAG 2.1 AA 기준으로 전체 접근성 검토.
 
 ---
 
-### TASK-19: 성능 최적화 ### TASK-19: 성능 최적화 & Lighthouse 검증 Lighthouse 검증 ✓ COMPLETED
+### TASK-19: 성능 최적화 & Lighthouse 검증 ✓ COMPLETED
 
 **설명:**  
 번들 크기 목표 달성 및 Core Web Vitals 최적화.
