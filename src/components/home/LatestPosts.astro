@@ -25,7 +25,7 @@ const { posts } = Astro.props;
     </div>
     <div class="post-grid">
       {posts.map((post) => (
-        <PostCard post={post} featured={post.data.featured} />
+        <PostCard post={post} />
       ))}
     </div>
   </div>
