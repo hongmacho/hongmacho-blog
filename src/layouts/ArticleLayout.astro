@@ -2,7 +2,6 @@
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
-import GiscusComments from '../components/comments/GiscusComments';
 import type { CollectionEntry } from 'astro:content';
 
 interface TocItem {
@@ -18,8 +17,6 @@ interface Props {
 
 const { post, toc } = Astro.props;
 const { title, excerpt, date, tags } = post.data;
-
-// Parse date string (YYYY-MM-DD) to Date object
 const publishDate = new Date(date);
 ---
 
@@ -30,69 +27,15 @@ const publishDate = new Date(date);
   tags={tags}
 >
   <Header />
-  <main class="article-page" id="main-content">
-    <div class="container article-page__inner">
-      <div class="article-content">
-        <slot />
-      </div>
+  <main id="main-content">
+    <div class="article-layout">
       {toc.length > 0 && (
-        <aside class="article-toc">
-          <div class="toc-sticky">
-            <slot name="toc" />
-          </div>
+        <aside aria-label="목차">
+          <slot name="toc" />
         </aside>
       )}
+      <slot />
     </div>
-    <section class="article-comments-section">
-      <div class="container">
-        <GiscusComments
-          client:visible
-          articleId={post.id}
-          articleTitle={title}
-        />
-      </div>
-    </section>
   </main>
   <Footer />
 </BaseLayout>
-
-<style>
-.article-page {
-  padding: 48px 0 80px;
-}
-
-.article-page__inner {
-  display: grid;
-  grid-template-columns: 1fr 220px;
-  gap: 48px;
-  align-items: start;
-  max-width: calc(var(--content-width, 720px) + 280px);
-  margin-inline: auto;
-}
-
-@container app (max-width: 960px) {
-  .article-page__inner {
-    grid-template-columns: 1fr;
-  }
-
-  .article-toc {
-    display: none;
-  }
-}
-
-.toc-sticky {
-  position: sticky;
-  top: 88px;
-}
-
-.article-comments-section {
-  background-color: var(--color-bg-secondary, #f9fafb);
-  padding: 48px 0 80px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .article-comments-section {
-    background-color: var(--color-bg-secondary, #1f2937);
-  }
-}
-</style>

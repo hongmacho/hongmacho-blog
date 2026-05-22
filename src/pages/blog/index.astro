@@ -33,129 +33,43 @@ const categoryCounts = CATEGORY_LIST.map((cat) => ({
   count: allPosts.filter((p) => p.data.category === cat.id).length,
 }));
 
-const pageTitle = selectedCat
-  ? `${CATEGORY_LIST.find(c => c.id === selectedCat)?.name ?? ''} 글 목록`
-  : selectedTag
-  ? `#${selectedTag} 태그 목록`
-  : '블로그';
+const headTitle = selectedTag
+  ? `#${selectedTag}`
+  : selectedCat
+  ? `${CATEGORY_LIST.find((c) => c.id === selectedCat)?.name ?? ''} 글`
+  : '전체 글';
+
+const headSub = selectedTag
+  ? `'${selectedTag}' 태그가 달린 글 ${filteredPosts.length}개`
+  : `총 ${filteredPosts.length}개의 글`;
 ---
 
-<BaseLayout title={`${pageTitle} | 홍마초의 잡생각`}>
+<BaseLayout title={`${headTitle} | 홍마초의 잡생각`}>
   <Header />
-  <main class="blog-list-page" id="main-content">
-    <div class="container blog-list-page__inner">
-      <aside class="blog-sidebar">
-        <Sidebar
-          categories={categoryCounts}
-          selectedCat={selectedCat}
-        />
+  <main id="main-content">
+    <div class="page-head">
+      <div class="container">
+        <h1 class="page-head__title">{headTitle}</h1>
+        <p class="page-head__sub">{headSub}</p>
+      </div>
+    </div>
+
+    <div class="container blog-layout">
+      <aside class="sidebar" aria-label="필터">
+        <Sidebar categories={categoryCounts} selectedCat={selectedCat} />
         <TagCloud tags={tagCounts} selectedTag={selectedTag} />
       </aside>
-      <section class="blog-list">
-        <div class="blog-list__header">
-          <h1 class="blog-list__title">{pageTitle}</h1>
-          <span class="blog-list__count">{filteredPosts.length}편</span>
-        </div>
-        {filteredPosts.length > 0 ? (
-          <ul class="blog-list__items">
-            {filteredPosts.map((post) => (
-              <li>
-                <ListItem post={post} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div class="blog-list__empty">
-            <p>글이 없습니다.</p>
-            <a href="/blog" class="btn btn--ghost">전체 보기</a>
+
+      <div class="blog-list">
+        {filteredPosts.length === 0 ? (
+          <div style="padding:64px 0;text-align:center;color:var(--color-label-alternative)">
+            해당 조건의 글이 아직 없습니다.
           </div>
+        ) : (
+          filteredPosts.map((post) => <ListItem post={post} />)
         )}
-      </section>
+      </div>
     </div>
   </main>
   <Footer />
 </BaseLayout>
-
-<style>
-.blog-list-page {
-  min-height: 60vh;
-  padding: 60px 0 80px;
-}
-
-.blog-list-page__inner {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 48px;
-  align-items: start;
-  max-width: calc(var(--content-width, 720px) + 280px);
-  margin-inline: auto;
-}
-
-@container app (max-width: 860px) {
-  .blog-list-page__inner {
-    grid-template-columns: 1fr;
-  }
-
-  .blog-sidebar {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-}
-
-.blog-list__header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 8px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.08));
-}
-
-.blog-list__title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-}
-
-.blog-list__count {
-  font-size: 14px;
-  color: var(--text-tertiary);
-}
-
-.blog-list__items {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.blog-list__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 60px 0;
-  color: var(--text-secondary);
-  text-align: center;
-}
-</style>
-
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const cat = params.get('cat');
-  const tag = params.get('tag');
-
-  const newParams = new URLSearchParams();
-  if (cat) newParams.set('cat', cat);
-  if (tag) newParams.set('tag', tag);
-
-  const newSearch = newParams.toString();
-  const newUrl = newSearch
-    ? `${window.location.pathname}?${newSearch}`
-    : window.location.pathname;
-
-  if (window.location.href !== new URL(newUrl, window.location.origin).href) {
-    window.history.replaceState({}, '', newUrl);
-  }
-</script>

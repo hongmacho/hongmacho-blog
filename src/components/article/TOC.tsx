@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TocItem {
   depth: number;
@@ -20,6 +20,8 @@ export default function TOC({ toc }: Props) {
     const headingEls = toc
       .map((item) => document.getElementById(item.slug))
       .filter((el): el is HTMLElement => el !== null);
+
+    if (headingEls.length === 0) return;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -45,21 +47,26 @@ export default function TOC({ toc }: Props) {
   if (toc.length === 0) return null;
 
   return (
-    <nav aria-label="목차" className="toc">
+    <nav className="toc" aria-label="목차">
       <div className="toc__title">목차</div>
       <ul className="toc__list">
         {toc.map((item) => (
-          <li key={item.slug} className={`toc__item toc__item--depth-${item.depth}`}>
+          <li key={item.slug}>
             <a
               href={`#${item.slug}`}
-              className={`toc__link ${activeSlug === item.slug ? 'is-active' : ''}`}
+              className={[
+                'toc__item',
+                item.depth === 3 ? 'toc__item--h3' : '',
+                activeSlug === item.slug ? 'is-active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
               onClick={(e) => {
                 e.preventDefault();
                 const el = document.getElementById(item.slug);
-                if (el) {
-                  const top = el.getBoundingClientRect().top + window.scrollY - 120;
-                  window.scrollTo({ top, behavior: 'smooth' });
-                }
+                if (!el) return;
+                const top = el.getBoundingClientRect().top + window.scrollY - 88;
+                window.scrollTo({ top, behavior: 'smooth' });
               }}
             >
               {item.text}
@@ -67,50 +74,6 @@ export default function TOC({ toc }: Props) {
           </li>
         ))}
       </ul>
-      <style>{`
-        .toc {
-          font-size: 13px;
-        }
-        .toc__title {
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--text-tertiary);
-          margin-bottom: 10px;
-        }
-        .toc__list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .toc__item--depth-3 {
-          padding-left: 14px;
-        }
-        .toc__link {
-          display: block;
-          padding: 5px 8px;
-          border-radius: 6px;
-          text-decoration: none;
-          color: var(--text-tertiary);
-          line-height: 1.4;
-          transition: color 0.1s, background 0.1s;
-          border-left: 2px solid transparent;
-        }
-        .toc__link:hover {
-          color: var(--text-primary);
-          background: var(--surface-2, rgba(0,0,0,0.04));
-        }
-        .toc__link.is-active {
-          color: var(--c-blue-50, #0066ff);
-          font-weight: 600;
-          border-left-color: var(--c-blue-50, #0066ff);
-          background: var(--c-blue-10, rgba(0,102,255,0.06));
-        }
-      `}</style>
     </nav>
   );
 }

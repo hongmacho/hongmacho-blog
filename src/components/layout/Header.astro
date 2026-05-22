@@ -1,15 +1,14 @@
 ---
 import ThemeToggle from '../ui/ThemeToggle';
 import WidthPicker from '../ui/WidthPicker';
-import MobileMenu from './MobileMenu.astro';
 import SearchOverlay from '../ui/SearchOverlay';
+import MobileMenu from './MobileMenu.astro';
 import { getCollection } from 'astro:content';
 
 const pathname = Astro.url.pathname;
 const isActive = (path: string) =>
   path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/');
 
-// Fetch all blog posts for search
 const allPosts = await getCollection('blog');
 const blogPosts = allPosts.map((post) => ({
   id: post.id,
@@ -17,7 +16,7 @@ const blogPosts = allPosts.map((post) => ({
   excerpt: post.data.excerpt,
   category: post.data.category,
   tags: post.data.tags,
-  date: post.data.date,
+  date: typeof post.data.date === 'string' ? post.data.date : post.data.date.toISOString(),
   slug: post.id,
 }));
 ---
@@ -39,9 +38,10 @@ const blogPosts = allPosts.map((post) => ({
       <a href="/about" class:list={['site-nav__link', { 'is-active': isActive('/about') }]} aria-current={isActive('/about') ? 'page' : undefined}>소개</a>
 
       <div class="site-header__tools">
-        <button class="icon-btn" id="search-open-btn" aria-label="검색" title="검색 (⌘K)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+        <button type="button" class="icon-btn" id="search-open-btn" aria-label="검색" title="검색 (⌘K)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
           </svg>
         </button>
         <WidthPicker client:load />
@@ -49,9 +49,17 @@ const blogPosts = allPosts.map((post) => ({
       </div>
     </nav>
 
-    <MobileMenu pathname={pathname} />
+    <button type="button" class="site-header__menu-btn" id="mobile-menu-btn" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobile-menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
   </div>
 </header>
+
+<MobileMenu pathname={pathname} />
 
 <SearchOverlay client:load allPosts={blogPosts} />
 
@@ -65,10 +73,12 @@ const blogPosts = allPosts.map((post) => ({
     onScroll();
   }
 
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      // SearchOverlay Island handles opening the modal via its global keydown listener
-    }
+  const openSearch = () => {
+    document.dispatchEvent(new CustomEvent('hongmacho:open-search'));
+  };
+  document.getElementById('search-open-btn')?.addEventListener('click', openSearch);
+  document.getElementById('mobile-search-btn')?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('hongmacho:close-mobile-menu'));
+    openSearch();
   });
 </script>

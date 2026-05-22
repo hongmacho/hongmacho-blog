@@ -1,127 +1,35 @@
 ---
-import HeroParallax from './HeroParallax.tsx';
+import { getCollection } from 'astro:content';
+import HeroVariants from './HeroVariants.tsx';
+
+const allPosts = await getCollection('blog');
+const recentTitles = [...allPosts]
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 15)
+  .map((p) => p.data.title);
 ---
 
-<header class="hero hero--aurora">
-  <div class="hero__parallax-container">
-    <HeroParallax client:idle containerWidth={400} containerHeight={300} />
-  </div>
-  <div class="container hero__inner">
-    <div class="hero__greeting-pill">
-      <span class="hero__greeting-dot" aria-hidden="true"></span>
-      새로운 생각이 매일 자랍니다
-    </div>
+<header class="hero hero--aurora" id="hero-root">
+  <HeroVariants client:load hostId="hero-root" postTitles={recentTitles} />
+
+  <div class="container">
+    <span class="hero__greeting">
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c-green-50);box-shadow:0 0 0 4px color-mix(in srgb, var(--c-green-50) 22%, transparent);"></span>
+      지금 글을 쓰고 있어요
+    </span>
+
     <h1 class="hero__title">
-      개발, 투자, 학습<br />그리고 일상의 기록
+      개발, 투자, 학습<span class="accent">.</span><br />
+      그리고 일상의 기록<span class="hero__caret" aria-hidden="true"></span>
     </h1>
+
     <p class="hero__sub">
-      소프트웨어 엔지니어 홍마초의 솔직한 생각과 경험을 공유합니다.
+      Spring/Java 백엔드 작업, 퀀트 투자, 책·강의 메모, 그리고 가끔의 회고. 다정하지만 단정한 글을 씁니다.
     </p>
+
     <div class="hero__cta-row">
-      <a href="/blog" class="btn btn--primary">블로그 시작하기</a>
-      <a href="/about" class="btn btn--ghost">소개 보기</a>
+      <a href="/blog" class="btn btn--white">최신 글 보기</a>
+      <a href="/about" class="btn btn--ghost">About</a>
     </div>
   </div>
 </header>
-
-<style>
-.hero {
-  padding: 128px 0 104px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero--aurora::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 60% -10%, rgba(0, 102, 255, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at -10% 80%, rgba(101, 65, 242, 0.10) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.hero__inner {
-  position: relative;
-  z-index: 1;
-  max-width: var(--content-width, 720px);
-  margin-inline: auto;
-}
-
-.hero__greeting-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 99px;
-  background: var(--surface-2, rgba(0, 102, 255, 0.06));
-  border: 1px solid var(--border-subtle, rgba(0, 102, 255, 0.15));
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--c-blue-50, #0066ff);
-  margin-bottom: 28px;
-}
-
-.hero__greeting-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--c-blue-50, #0066ff);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__greeting-dot {
-    animation: none;
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.hero__title {
-  font-size: clamp(36px, 6vw, 64px);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  margin-bottom: 20px;
-}
-
-.hero__sub {
-  font-size: 18px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  max-width: 480px;
-  margin-bottom: 40px;
-}
-
-.hero__cta-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.hero__parallax-container {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.hero-parallax {
-  opacity: 0.5;
-}
-
-.hero-parallax__svg {
-  color: var(--text-secondary);
-}
-</style>

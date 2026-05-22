@@ -8,37 +8,53 @@ const isActive = (path: string) =>
   path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/');
 ---
 
-<div class="mobile-menu-wrapper">
-  <button class="icon-btn mobile-hamburger" id="mobile-menu-btn" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobile-nav">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="3" y1="6" x2="21" y2="6"/>
-      <line x1="3" y1="12" x2="21" y2="12"/>
-      <line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
+<aside id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation" aria-hidden="true">
+  <a href="/" class:list={['mobile-menu__link', { 'is-active': isActive('/') }]} aria-current={isActive('/') ? 'page' : undefined}>
+    홈
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+  </a>
+  <a href="/blog" class:list={['mobile-menu__link', { 'is-active': isActive('/blog') }]} aria-current={isActive('/blog') ? 'page' : undefined}>
+    블로그
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+  </a>
+  <a href="/about" class:list={['mobile-menu__link', { 'is-active': isActive('/about') }]} aria-current={isActive('/about') ? 'page' : undefined}>
+    소개
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+  </a>
+  <button type="button" class="mobile-menu__link" id="mobile-search-btn" style="cursor:pointer;background:transparent;border:none;border-bottom:1px solid var(--color-line-alternative);text-align:left;font:inherit;color:inherit;">
+    검색
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
   </button>
-
-  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation" hidden>
-    <a href="/" class:list={['mobile-nav__link', { 'is-active': isActive('/') }]} aria-current={isActive('/') ? 'page' : undefined}>홈</a>
-    <a href="/blog" class:list={['mobile-nav__link', { 'is-active': isActive('/blog') }]} aria-current={isActive('/blog') ? 'page' : undefined}>블로그</a>
-    <a href="/about" class:list={['mobile-nav__link', { 'is-active': isActive('/about') }]} aria-current={isActive('/about') ? 'page' : undefined}>소개</a>
-  </nav>
-</div>
+</aside>
 
 <script>
   const btn = document.getElementById('mobile-menu-btn');
-  const nav = document.getElementById('mobile-nav');
+  const menu = document.getElementById('mobile-menu');
+
+  function setOpen(open: boolean) {
+    if (!btn || !menu) return;
+    btn.setAttribute('aria-expanded', String(open));
+    menu.classList.toggle('is-open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
 
   btn?.addEventListener('click', () => {
     const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    if (nav) nav.hidden = expanded;
+    setOpen(!expanded);
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && btn?.getAttribute('aria-expanded') === 'true') {
-      btn.setAttribute('aria-expanded', 'false');
-      if (nav) nav.hidden = true;
+      setOpen(false);
       btn.focus();
     }
   });
+
+  // Close drawer when a link is clicked (lets navigation start cleanly)
+  menu?.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => setOpen(false));
+  });
+
+  document.addEventListener('hongmacho:close-mobile-menu', () => setOpen(false));
 </script>

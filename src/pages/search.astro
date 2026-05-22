@@ -3,448 +3,101 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import ListItem from '../components/blog/ListItem.astro';
-import TagCloud from '../components/blog/TagCloud.astro';
 import { getCollection } from 'astro:content';
 import { searchPosts } from '../lib/search';
-import { formatDate } from '../lib/utils';
 import type { BlogPost } from '../lib/search';
 
 const allPosts = await getCollection('blog');
 
-// Convert CollectionEntry to BlogPost format
 const blogPosts: BlogPost[] = allPosts.map((post) => ({
   id: post.id,
   title: post.data.title,
   excerpt: post.data.excerpt,
   category: post.data.category,
   tags: post.data.tags,
-  date: post.data.date,
+  date: typeof post.data.date === 'string' ? post.data.date : post.data.date.toISOString(),
   slug: post.id,
 }));
 
 const query = Astro.url.searchParams.get('q') || '';
-const results = query.trim() ? searchPosts(blogPosts, query) : [];
+const trimmed = query.trim();
+const results = trimmed ? searchPosts(blogPosts, trimmed) : [];
 
-// Get tag data for TagCloud empty state
 const tagCounts = new Map<string, number>();
 allPosts.forEach((post) => {
   post.data.tags.forEach((tag) => {
     tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
   });
 });
-const tagsWithCount = Array.from(tagCounts.entries())
+const popularTags = Array.from(tagCounts.entries())
   .map(([tag, count]) => ({ tag, count }))
-  .sort((a, b) => b.count - a.count);
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 8);
 
-// Helper function to highlight search term in text
-function highlightText(text: string, searchQuery: string): string {
-  if (!searchQuery.trim()) return text;
-  const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
-}
-
-// Get CollectionEntry items for ListItem component
 const resultEntries = allPosts.filter((post) => results.some((r) => r.id === post.id));
 ---
 
-<BaseLayout title={`Search Results${query ? ` for "${query}"` : ''}`} description="Search blog posts">
+<BaseLayout title={trimmed ? `"${trimmed}" 검색 결과 | 홍마초의 잡생각` : '검색'} description="검색 결과">
   <Header />
-  <main class="search-page" id="main-content">
-    <div class="container search-page__inner">
-      <div class="search-page__header">
-        <h1 class="search-page__title">Search Results</h1>
-        {
-          query && (
-            <p class="search-page__subtitle">
-              {results.length} result{results.length !== 1 ? 's' : ''} for &quot;
-              <strong>{query}</strong>&quot;
-            </p>
-          )
-        }
+  <main id="main-content">
+    <div class="container search-results-page">
+      <div class="search-results-page__head">
+        <div class="search-results-page__label">검색 결과</div>
+        <h1 class="search-results-page__query">
+          <span class="quote">"</span>{trimmed || '검색어 없음'}<span class="quote">"</span>
+        </h1>
+        <div class="search-results-page__count">
+          {trimmed ? `${results.length}개의 결과` : '검색어를 입력하세요.'}
+        </div>
       </div>
 
-      {
-        query && results.length > 0 ? (
-          <div class="search-page__layout">
-            <section class="search-page__results">
-              <ul class="search-page__list">
-                {resultEntries.map((post) => (
-                  <li>
-                    <article class="search-result-item">
-                      <div class="search-result-item__header">
-                        <a href={`/blog/${post.id}`} class="search-result-item__link">
-                          <h2 class="search-result-item__title">{post.data.title}</h2>
-                        </a>
-                      </div>
-                      <p
-                        class="search-result-item__excerpt"
-                        set:html={highlightText(post.data.excerpt, query)}
-                      />
-                      <div class="search-result-item__footer">
-                        <div class="search-result-item__meta">
-                          <span class="cat-badge cat-badge--dev">{post.data.category}</span>
-                          <time datetime={post.data.date} class="search-result-item__date">
-                            {formatDate(post.data.date)}
-                          </time>
-                          {post.data.readTime && (
-                            <span class="search-result-item__read-time">
-                              {post.data.readTime}분 읽기
-                            </span>
-                          )}
-                        </div>
-                        {post.data.tags.length > 0 && (
-                          <div class="search-result-item__tags">
-                            {post.data.tags.slice(0, 3).map((tag) => (
-                              <a href={`/blog?tag=${tag}`} class="search-result-item__tag">
-                                #{tag}
-                              </a>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </article>
-                  </li>
-                ))}
-              </ul>
-            </section>
+      <form class="search-results-page__form" method="get" action="/search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--color-label-alternative)">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          name="q"
+          value={trimmed}
+          placeholder="다시 검색…"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn btn--primary" style="height:36px;padding:0 14px">
+          검색
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 5l7 7-7 7" />
+          </svg>
+        </button>
+      </form>
 
-            <aside class="search-page__sidebar">
-              <TagCloud tags={tagsWithCount} selectedTag={null} />
-            </aside>
+      {trimmed && results.length === 0 && (
+        <div style="padding:64px 24px;border:1px dashed var(--color-line-normal);border-radius:16px;text-align:center;color:var(--color-label-alternative);background:var(--color-bg-alternative);max-width:640px">
+          <h3 style="margin:0 0 8px;color:var(--color-label-normal);font-size:18px">
+            일치하는 글이 없어요
+          </h3>
+          <p style="margin:0 0 16px;font-size:14px">
+            철자를 확인하거나, 더 짧은 키워드로 다시 시도해보세요.<br/>
+            혹은 아래 추천 태그를 살펴봐도 좋아요.
+          </p>
+          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+            {popularTags.map((t) => (
+              <a href={`/blog?tag=${encodeURIComponent(t.tag)}`} class="tag">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:0.55;margin-right:3px">
+                  <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18" />
+                </svg>
+                {t.tag}
+              </a>
+            ))}
           </div>
-        ) : query && results.length === 0 ? (
-          <div class="search-page__empty">
-            <svg
-              class="search-page__empty-icon"
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-            <h2 class="search-page__empty-title">No Results Found</h2>
-            <p class="search-page__empty-text">
-              No posts found matching &quot;<strong>{query}</strong>&quot;
-            </p>
-            <p class="search-page__empty-hint">Try searching with different keywords</p>
-            <a href="/blog" class="search-page__empty-link">Browse all posts →</a>
-          </div>
-        ) : (
-          <div class="search-page__empty">
-            <svg
-              class="search-page__empty-icon"
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-            <h2 class="search-page__empty-title">Start Searching</h2>
-            <p class="search-page__empty-text">Enter a keyword to search through blog posts</p>
+        </div>
+      )}
 
-            <div class="search-page__tag-cloud">
-              <p class="search-page__tag-cloud-title">Popular Tags</p>
-              <TagCloud tags={tagsWithCount} selectedTag={null} />
-            </div>
-          </div>
-        )
-      }
+      {trimmed && results.length > 0 && (
+        <div class="search-results-page__list">
+          {resultEntries.map((post) => <ListItem post={post} />)}
+        </div>
+      )}
     </div>
   </main>
   <Footer />
 </BaseLayout>
-
-<style>
-  .search-page {
-    padding: 80px 0;
-    min-height: calc(100vh - 280px);
-  }
-
-  .search-page__inner {
-    max-width: var(--content-width, 720px);
-    margin-inline: auto;
-  }
-
-  .search-page__header {
-    margin-bottom: 48px;
-  }
-
-  .search-page__title {
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    margin: 0 0 16px 0;
-  }
-
-  .search-page__subtitle {
-    font-size: 16px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  .search-page__subtitle strong {
-    color: var(--c-blue-50, #0066ff);
-    font-weight: 600;
-  }
-
-  .search-page__layout {
-    display: grid;
-    grid-template-columns: 1fr 240px;
-    gap: 40px;
-  }
-
-  .search-page__results {
-    grid-column: 1;
-  }
-
-  .search-page__sidebar {
-    grid-column: 2;
-  }
-
-  .search-page__list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .search-result-item {
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    transition: opacity 0.15s ease;
-  }
-
-  .search-result-item:last-child {
-    border-bottom: none;
-  }
-
-  .search-result-item:hover {
-    opacity: 0.8;
-  }
-
-  .search-result-item__header {
-    margin-bottom: 12px;
-  }
-
-  .search-result-item__link {
-    text-decoration: none;
-  }
-
-  .search-result-item__title {
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.4;
-    color: var(--text-primary);
-    margin: 0;
-    transition: color 0.15s ease;
-  }
-
-  .search-result-item__link:hover .search-result-item__title {
-    color: var(--c-blue-50, #0066ff);
-  }
-
-  .search-result-item__excerpt {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 12px 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .search-result-item__excerpt :global(mark) {
-    background: var(--mark-bg, #fff3cd);
-    color: var(--mark-text, #333);
-    padding: 0 2px;
-    border-radius: 2px;
-    font-weight: 500;
-  }
-
-  .search-result-item__footer {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-  }
-
-  .search-result-item__meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-tertiary);
-  }
-
-  .search-result-item__date::before {
-    content: '·';
-    margin-right: 8px;
-  }
-
-  .search-result-item__read-time::before {
-    content: '·';
-    margin-right: 8px;
-  }
-
-  .search-result-item__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .search-result-item__tag {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    background: var(--surface-2, rgba(0, 0, 0, 0.04));
-    padding: 3px 8px;
-    border-radius: 99px;
-    text-decoration: none;
-    transition: background 0.1s ease, color 0.1s ease;
-  }
-
-  .search-result-item__tag:hover {
-    background: var(--c-blue-10, rgba(0, 102, 255, 0.08));
-    color: var(--c-blue-50, #0066ff);
-  }
-
-  .search-page__empty {
-    text-align: center;
-    padding: 60px 20px;
-  }
-
-  .search-page__empty-icon {
-    margin: 0 auto 24px;
-    color: var(--text-tertiary);
-    opacity: 0.5;
-  }
-
-  .search-page__empty-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 12px 0;
-  }
-
-  .search-page__empty-text {
-    font-size: 16px;
-    color: var(--text-secondary);
-    margin: 0 0 8px 0;
-  }
-
-  .search-page__empty-text strong {
-    color: var(--c-blue-50, #0066ff);
-    font-weight: 600;
-  }
-
-  .search-page__empty-hint {
-    font-size: 14px;
-    color: var(--text-tertiary);
-    margin: 0 0 32px 0;
-  }
-
-  .search-page__empty-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background: var(--c-blue-50, #0066ff);
-    color: white;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: opacity 0.15s ease;
-  }
-
-  .search-page__empty-link:hover {
-    opacity: 0.9;
-  }
-
-  .search-page__tag-cloud {
-    margin-top: 40px;
-    padding-top: 40px;
-    border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-  }
-
-  .search-page__tag-cloud-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 16px 0;
-  }
-
-  /* Container queries for responsive design */
-  @container app (max-width: 960px) {
-    .search-page__layout {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    .search-page__sidebar {
-      grid-column: 1;
-    }
-  }
-
-  @container app (max-width: 640px) {
-    .search-page {
-      padding: 40px 0;
-    }
-
-    .search-page__title {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-
-    .search-page__subtitle {
-      font-size: 14px;
-    }
-
-    .search-result-item {
-      padding: 20px 0;
-    }
-
-    .search-result-item__title {
-      font-size: 16px;
-    }
-
-    .search-result-item__excerpt {
-      -webkit-line-clamp: 2;
-      font-size: 13px;
-    }
-
-    .search-page__footer {
-      margin-top: 40px;
-    }
-
-    .search-page__empty {
-      padding: 40px 16px;
-    }
-
-    .search-page__empty-icon {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-    }
-
-    .search-page__empty-title {
-      font-size: 20px;
-    }
-
-    .search-page__empty-text {
-      font-size: 14px;
-    }
-  }
-</style>

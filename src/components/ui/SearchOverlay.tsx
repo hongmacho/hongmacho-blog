@@ -1,288 +1,374 @@
-import { useState, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type { BlogPost } from '../../lib/search';
 import { searchPosts } from '../../lib/search';
-import { formatDate } from '../../lib/utils';
-import './SearchOverlay.css';
+import { CATEGORIES, CATEGORY_LIST, type CategoryId } from '../../lib/categories';
 
-interface SearchOverlayProps {
+interface Props {
   allPosts: BlogPost[];
 }
 
-function highlightText(text: string, query: string): string {
-  if (!query.trim()) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
+const RECENT_KEY = 'blog-recent-searches';
+const MAX_VISIBLE = 8;
+
+function loadRecent(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
 }
 
-export default function SearchOverlay({ allPosts }: SearchOverlayProps) {
-  const [isOpen, setIsOpen] = useState(false);
+function pushRecent(q: string): string[] {
+  const trimmed = q.trim();
+  if (!trimmed) return loadRecent();
+  const next = [trimmed, ...loadRecent().filter((x) => x !== trimmed)].slice(0, 5);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  return next;
+}
+
+function escapeRe(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlight(text: string, query: string) {
+  const q = query.trim();
+  if (!q) return text;
+  const re = new RegExp(`(${escapeRe(q)})`, 'gi');
+  const parts = text.split(re);
+  return parts.map((p, i) =>
+    p.toLowerCase() === q.toLowerCase() ? <mark key={i}>{p}</mark> : <Fragment key={i}>{p}</Fragment>
+  );
+}
+
+export default function SearchOverlay({ allPosts }: Props) {
+  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<BlogPost[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [recent, setRecent] = useState<string[]>([]);
+
+  const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-  // Load recent searches from localStorage on mount
+  const results = useMemo(() => (query.trim() ? searchPosts(allPosts, query) : []), [allPosts, query]);
+  const visible = results.slice(0, MAX_VISIBLE);
+
+  // Featured / suggested posts for empty state: top 3 most recent
+  const suggested = useMemo(
+    () => [...allPosts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 3),
+    [allPosts]
+  );
+
+  // ── Open hooks: custom event + Cmd/Ctrl+K + '/'
   useEffect(() => {
-    const stored = localStorage.getItem('blog-recent-searches');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setRecentSearches(parsed);
+    const onOpen = () => setOpen(true);
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setOpen(true);
+        return;
+      }
+      if (!open && e.key === '/') {
+        const tag = (document.activeElement && (document.activeElement as HTMLElement).tagName) || '';
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+          e.preventDefault();
+          setOpen(true);
         }
-      } catch {
-        // Invalid JSON, ignore
       }
-    }
-  }, []);
+    };
+    document.addEventListener('hongmacho:open-search', onOpen as EventListener);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('hongmacho:open-search', onOpen as EventListener);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
 
-  // Focus input when modal opens
+  // ── On open: load recent, lock body scroll, focus input
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+    if (!open) return;
+    setRecent(loadRecent());
+    setQuery('');
+    setActiveIdx(0);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const t = setTimeout(() => inputRef.current?.focus(), 0);
+    return () => {
+      clearTimeout(t);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
 
-  // Scroll selected result into view
+  // ── Reset active index when query changes
   useEffect(() => {
-    if (resultsContainerRef.current) {
-      const selectedElement = resultsContainerRef.current.querySelector(
-        `[data-index="${selectedIndex}"]`
-      ) as HTMLElement;
-      if (selectedElement) {
-        selectedElement.scrollIntoView({ block: 'nearest' });
-      }
-    }
-  }, [selectedIndex]);
+    setActiveIdx(0);
+  }, [query]);
 
-  const displayResults =
-    query.trim() === '' ? recentSearches.map((q) => q) : results.map((r) => r.title);
-  const actualResults = query.trim() === '' ? [] : results;
-
-  const handleSearch = (value: string) => {
-    setQuery(value);
-    if (value.trim()) {
-      const searchResults = searchPosts(allPosts, value);
-      setResults(searchResults);
-      setSelectedIndex(0);
-    } else {
-      setResults([]);
-      setSelectedIndex(0);
-    }
-  };
-
-  const saveSearch = (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-    const updated = [searchQuery, ...recentSearches.filter((s) => s !== searchQuery)].slice(
-      0,
-      5
-    );
-    setRecentSearches(updated);
-    localStorage.setItem('blog-recent-searches', JSON.stringify(updated));
-  };
-
-  const handleSelectResult = (post: BlogPost) => {
-    saveSearch(query);
-    window.location.href = `/blog/${post.slug}`;
-  };
-
-  const handleSelectRecent = (recentQuery: string) => {
-    setQuery(recentQuery);
-    const searchResults = searchPosts(allPosts, recentQuery);
-    setResults(searchResults);
-    setSelectedIndex(0);
-  };
-
-  // Focus trap: keep focus inside modal when open
+  // ── Keep active row visible
   useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-    const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const focusable = Array.from(modalRef.current.querySelectorAll<HTMLElement>(focusableSelectors));
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+    if (!bodyRef.current) return;
+    const el = bodyRef.current.querySelector('.search-result.is-active');
+    if (el) (el as HTMLElement).scrollIntoView({ block: 'nearest' });
+  }, [activeIdx]);
+
+  // ── Focus trap
+  useEffect(() => {
+    if (!open || !modalRef.current) return;
+    const root = modalRef.current;
     const trap = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      const focusable = root.querySelectorAll<HTMLElement>(
+        'button, [href], input, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener('keydown', trap);
     return () => document.removeEventListener('keydown', trap);
-  }, [isOpen]);
+  }, [open]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  function close() {
+    setOpen(false);
+  }
+
+  function navigate(href: string) {
+    window.location.href = href;
+  }
+
+  function pickPost(post: BlogPost) {
+    pushRecent(query);
+    close();
+    navigate(`/blog/${post.slug}`);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') {
-      setIsOpen(false);
-    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((prev) => Math.max(0, prev - 1));
+      close();
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      const maxIndex = query.trim() === '' ? recentSearches.length : results.length;
-      setSelectedIndex((prev) => Math.min(maxIndex - 1, prev + 1));
+      setActiveIdx((i) => Math.min(Math.max(visible.length - 1, 0), i + 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(0, i - 1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (query.trim() === '' && selectedIndex < recentSearches.length) {
-        handleSelectRecent(recentSearches[selectedIndex]);
-      } else if (query.trim() !== '' && selectedIndex < results.length) {
-        handleSelectResult(results[selectedIndex]);
+      const q = query.trim();
+      if (visible.length > 0) {
+        pickPost(visible[activeIdx] ?? visible[0]);
+      } else if (q) {
+        pushRecent(q);
+        close();
+        navigate(`/search?q=${encodeURIComponent(q)}`);
       }
     }
-  };
+  }
 
-  // Global keydown listener for '/' or Cmd+K to open modal
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen && (e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'))) {
-        e.preventDefault();
-        setIsOpen(true);
-      }
-    };
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isOpen]);
+  function clearRecent() {
+    localStorage.removeItem(RECENT_KEY);
+    setRecent([]);
+  }
 
-  if (!isOpen) return null;
+  if (!open) return null;
+
+  const trimmed = query.trim();
+  const seeAllHref = `/search?q=${encodeURIComponent(trimmed)}`;
 
   return (
-    <div className="search-overlay">
-      <div className="search-overlay__backdrop" onClick={() => setIsOpen(false)} />
-      <div ref={modalRef} className="search-overlay__modal" role="dialog" aria-modal="true" aria-label="포스트 검색">
-        <div className="search-overlay__header">
+    <div
+      ref={overlayRef}
+      className="search-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="검색"
+    >
+      <div ref={modalRef} className="search-modal">
+        <div className="search-input-row">
+          <span className="search-input-row__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </span>
           <input
             ref={inputRef}
             type="text"
-            placeholder="포스트 검색..."
+            className="search-input"
+            placeholder="제목, 본문 요약, 태그로 검색…"
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="search-overlay__input"
             aria-label="포스트 검색"
+            autoComplete="off"
+            spellCheck={false}
           />
-          <button
-            onClick={() => setIsOpen(false)}
-            className="search-overlay__close"
-            aria-label="검색 닫기"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+          <span className="search-kbd" aria-hidden="true">ESC</span>
         </div>
 
-        <div className="search-overlay__body" ref={resultsContainerRef} aria-live="polite" aria-atomic="false">
-          {query.trim() === '' ? (
-            <div className="search-overlay__section">
-              <div className="search-overlay__section-title">최근 검색어</div>
-              {recentSearches.length > 0 ? (
-                <ul className="search-overlay__list">
-                  {recentSearches.map((recentQuery, index) => (
-                    <li key={index}>
+        <div className="search-body" ref={bodyRef} aria-live="polite" aria-atomic="false">
+          {!trimmed && (
+            <>
+              {recent.length > 0 && (
+                <>
+                  <div className="search-section-title">최근 검색</div>
+                  <div className="search-chip-row">
+                    {recent.map((q) => (
                       <button
-                        className={`search-overlay__result search-overlay__result--recent ${
-                          selectedIndex === index ? 'is-selected' : ''
-                        }`}
-                        onClick={() => handleSelectRecent(recentQuery)}
-                        onMouseEnter={() => setSelectedIndex(index)}
-                        data-index={index}
+                        key={q}
+                        type="button"
+                        className="search-chip"
+                        onClick={() => setQuery(q)}
                       >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <polyline points="23 4 23 10 17 10" />
-                          <path d="M20.49 15a9 9 0 1 1-2-8.12" />
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 6v6l4 2" />
                         </svg>
-                        <span>{recentQuery}</span>
+                        {q}
                       </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="search-overlay__empty">최근 검색어가 없습니다</p>
-              )}
-            </div>
-          ) : results.length > 0 ? (
-            <div className="search-overlay__section">
-              <div className="search-overlay__section-title">
-                &quot;{query}&quot; 검색 결과 {results.length}건
-              </div>
-              <ul className="search-overlay__list">
-                {results.map((post, index) => (
-                  <li key={post.id}>
+                    ))}
                     <button
-                      className={`search-overlay__result ${
-                        selectedIndex === index ? 'is-selected' : ''
-                      }`}
-                      onClick={() => handleSelectResult(post)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      data-index={index}
+                      type="button"
+                      className="search-chip"
+                      style={{ background: 'transparent' }}
+                      onClick={clearRecent}
                     >
-                      <div className="search-overlay__result-meta">
-                        <span className="cat-badge">{post.category}</span>
-                        <span className="search-overlay__date">{formatDate(post.date)}</span>
-                      </div>
-                      <h4 className="search-overlay__result-title">{post.title}</h4>
-                      <p
-                        className="search-overlay__result-excerpt"
-                        dangerouslySetInnerHTML={{
-                          __html: highlightText(post.excerpt, query),
-                        }}
-                      />
-                      {post.tags.length > 0 && (
-                        <div className="search-overlay__tags">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="search-overlay__tag">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      지우기
                     </button>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                </>
+              )}
+
+              <div className="search-section-title">카테고리로 둘러보기</div>
+              {CATEGORY_LIST.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className="search-result"
+                  onClick={() => {
+                    close();
+                    navigate(`/blog?cat=${c.id}`);
+                  }}
+                >
+                  <div>
+                    <div className="search-result__title">{c.name} 글 모두 보기</div>
+                    <div className="search-result__excerpt">{c.desc}</div>
+                  </div>
+                  <div className="search-result__meta">
+                    <span className="cat-badge" data-cat={c.id}>{c.name}</span>
+                  </div>
+                </button>
+              ))}
+
+              {suggested.length > 0 && (
+                <>
+                  <div className="search-section-title">추천 글</div>
+                  {suggested.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="search-result"
+                      onClick={() => pickPost(p)}
+                    >
+                      <div>
+                        <div className="search-result__title">{p.title}</div>
+                        <div className="search-result__excerpt">{p.excerpt}</div>
+                      </div>
+                      <div className="search-result__meta">
+                        <span className="cat-badge" data-cat={p.category}>{CATEGORIES[p.category as CategoryId]?.name ?? p.category}</span>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+            </>
+          )}
+
+          {trimmed && results.length === 0 && (
+            <div className="search-empty">
+              "<strong>{query}</strong>" 에 해당하는 결과가 없습니다.
+              <div style={{ marginTop: 12 }}>
+                <button
+                  type="button"
+                  className="search-chip"
+                  onClick={() => {
+                    pushRecent(query);
+                    close();
+                    navigate(seeAllHref);
+                  }}
+                >
+                  전체 검색 결과 페이지 열기
+                </button>
+              </div>
             </div>
-          ) : (
-            <div className="search-overlay__empty-state">
-              <p>&quot;{query}&quot;에 대한 검색 결과가 없습니다</p>
-              <p className="search-overlay__empty-hint">다른 키워드로 검색해 보세요</p>
-            </div>
+          )}
+
+          {trimmed && results.length > 0 && (
+            <>
+              <div className="search-section-title">결과 {results.length}개 — 글</div>
+              {visible.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`search-result ${i === activeIdx ? 'is-active' : ''}`}
+                  onMouseEnter={() => setActiveIdx(i)}
+                  onClick={() => pickPost(p)}
+                >
+                  <div>
+                    <div className="search-result__title">{highlight(p.title, query)}</div>
+                    <div className="search-result__excerpt">{highlight(p.excerpt, query)}</div>
+                  </div>
+                  <div className="search-result__meta">
+                    <span className="cat-badge" data-cat={p.category}>{CATEGORIES[p.category as CategoryId]?.name ?? p.category}</span>
+                  </div>
+                </button>
+              ))}
+              {results.length > MAX_VISIBLE && (
+                <button
+                  type="button"
+                  className="search-result"
+                  style={{ marginTop: 4 }}
+                  onClick={() => {
+                    pushRecent(query);
+                    close();
+                    navigate(seeAllHref);
+                  }}
+                >
+                  <div>
+                    <div className="search-result__title" style={{ color: 'var(--color-primary-normal)' }}>
+                      전체 결과 {results.length}개 모두 보기 →
+                    </div>
+                  </div>
+                  <div className="search-result__meta">
+                    <span className="search-kbd">ENTER</span>
+                  </div>
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        <div className="search-overlay__footer">
-          <div className="search-overlay__shortcuts">
-            <span className="search-overlay__shortcut">
-              <kbd>↑↓</kbd> 탐색
-            </span>
-            <span className="search-overlay__shortcut">
-              <kbd>Enter</kbd> 선택
-            </span>
-            <span className="search-overlay__shortcut">
-              <kbd>Esc</kbd> 닫기
-            </span>
+        <div className="search-footer">
+          <div className="search-footer__keys">
+            <span className="search-footer__key"><span className="search-kbd">↑↓</span> 이동</span>
+            <span className="search-footer__key"><span className="search-kbd">↵</span> 선택</span>
+            <span className="search-footer__key"><span className="search-kbd">ESC</span> 닫기</span>
           </div>
+          <span>실시간 검색</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 ---
 import PostCard from '../blog/PostCard.astro';
+import GiscusComments from '../comments/GiscusComments';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -8,144 +9,81 @@ interface Props {
 }
 
 const { post, related } = Astro.props;
-const { tags } = post.data;
+const { tags, title } = post.data;
 ---
 
-<footer class="article-footer">
-  <div class="article-footer__tags">
-    {tags.map((tag) => (
-      <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="article-footer__tag">#{tag}</a>
-    ))}
-  </div>
-
-  <div class="article-footer__actions">
-    <button class="article-footer__copy-btn" id="copy-link-btn" aria-label="링크 복사">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-      </svg>
-      링크 복사
-    </button>
+<footer class="article__footer">
+  <div class="article__share">
+    <div class="article__share-tags">
+      {tags.map((tag) => (
+        <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="tag">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:0.55;margin-right:3px">
+            <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18" />
+          </svg>
+          {tag}
+        </a>
+      ))}
+    </div>
+    <div class="share-actions">
+      <button type="button" class="btn btn--ghost" id="copy-link-btn" aria-label="링크 복사">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect width="14" height="14" x="8" y="8" rx="2" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+        </svg>
+        링크 복사
+      </button>
+      <a class="btn btn--ghost" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=`} target="_blank" rel="noopener noreferrer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+        공유
+      </a>
+    </div>
   </div>
 
   {related.length > 0 && (
-    <div class="article-footer__related">
-      <h3 class="article-footer__related-title">관련 글</h3>
-      <div class="article-footer__related-grid">
-        {related.map((p) => (
-          <PostCard post={p} />
-        ))}
+    <div class="related">
+      <h2 class="related__title">관련 글</h2>
+      <div class="related__grid">
+        {related.map((p) => <PostCard post={p} />)}
       </div>
     </div>
   )}
 
-  <div class="article-footer__comments" id="giscus-placeholder">
-    <!-- Giscus 댓글 (GitHub Actions 설정 후 활성화) -->
-    <div class="article-footer__comments-placeholder">
-      <p>댓글 기능은 GitHub 저장소 연동 후 사용 가능합니다.</p>
-    </div>
+  <div class="article__comments-block">
+    <h2 class="related__title">댓글</h2>
+    <GiscusComments client:visible articleId={post.id} articleTitle={title} />
   </div>
 </footer>
 
+<style>
+  .article__comments-block {
+    margin-top: 8px;
+  }
+  .article__comments-block .related__title {
+    margin-bottom: 12px;
+  }
+  /* Let Giscus breathe; remove any extra chrome from the iframe wrapper */
+  .article__comments-block :global(#giscus-container) {
+    min-height: 200px;
+  }
+</style>
+
 <script>
-  document.getElementById('copy-link-btn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('copy-link-btn');
+  btn?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      const btn = document.getElementById('copy-link-btn');
-      if (btn) {
-        const original = btn.textContent;
-        btn.textContent = '복사됨!';
-        setTimeout(() => { if (btn) btn.textContent = original; }, 2000);
-      }
+      const original = btn.innerHTML;
+      btn.innerHTML = '복사됨!';
+      setTimeout(() => { btn.innerHTML = original; }, 2000);
     } catch {
       // ignore
     }
   });
+
+  // Append the current URL to the share button href at runtime
+  document.querySelectorAll<HTMLAnchorElement>('.share-actions a[href*="twitter.com/intent"]').forEach((a) => {
+    a.href = a.href + encodeURIComponent(window.location.href);
+  });
 </script>
-
-<style>
-.article-footer {
-  margin-top: 64px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.08));
-}
-
-.article-footer__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.article-footer__tag {
-  font-size: 14px;
-  color: var(--text-secondary);
-  background: var(--surface-2, rgba(0,0,0,0.04));
-  padding: 6px 14px;
-  border-radius: 99px;
-  text-decoration: none;
-  transition: color 0.1s, background 0.1s;
-  border: 1px solid var(--border-subtle, rgba(0,0,0,0.08));
-}
-
-.article-footer__tag:hover {
-  color: var(--c-blue-50, #0066ff);
-  background: var(--c-blue-10, rgba(0,102,255,0.08));
-}
-
-.article-footer__actions {
-  margin-bottom: 48px;
-}
-
-.article-footer__copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border-subtle, rgba(0,0,0,0.1));
-  background: var(--surface-overlay, #fff);
-  color: var(--text-secondary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: border-color 0.1s, color 0.1s;
-}
-
-.article-footer__copy-btn:hover {
-  border-color: var(--c-blue-50, #0066ff);
-  color: var(--c-blue-50, #0066ff);
-}
-
-.article-footer__related {
-  margin-bottom: 48px;
-}
-
-.article-footer__related-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.article-footer__related-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-@container app (max-width: 640px) {
-  .article-footer__related-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.article-footer__comments-placeholder {
-  padding: 40px;
-  text-align: center;
-  background: var(--surface-2, rgba(0,0,0,0.025));
-  border-radius: 12px;
-  color: var(--text-tertiary);
-  font-size: 14px;
-}
-</style>

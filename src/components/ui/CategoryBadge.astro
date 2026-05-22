@@ -10,6 +10,6 @@ const { category, class: className } = Astro.props;
 const cat = CATEGORIES[category];
 ---
 
-<span class:list={['cat-badge', `cat-badge--${category}`, className]}>
+<span class:list={['cat-badge', className]} data-cat={category}>
   {cat.name}
 </span>

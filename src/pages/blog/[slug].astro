@@ -4,7 +4,6 @@ import ArticleHeader from '../../components/article/ArticleHeader.astro';
 import ArticleFooter from '../../components/article/ArticleFooter.astro';
 import TOC from '../../components/article/TOC';
 import { getCollection, render } from 'astro:content';
-import { calcReadTime } from '../../lib/readTime';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -29,10 +28,12 @@ const related = allPosts
 ---
 
 <ArticleLayout post={post} toc={toc}>
-  <ArticleHeader post={post} slot="default" />
-  <article class="prose">
-    <Content />
-  </article>
-  <ArticleFooter post={post} related={related} slot="default" />
   <TOC client:load toc={toc} slot="toc" />
+  <article class="article">
+    <ArticleHeader post={post} />
+    <div class="prose">
+      <Content />
+    </div>
+    <ArticleFooter post={post} related={related} />
+  </article>
 </ArticleLayout>
