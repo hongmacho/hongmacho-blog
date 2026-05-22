@@ -1,5 +1,6 @@
 ---
 import SEOHead from '../components/layout/SEOHead.astro';
+import { SETTINGS } from '@/lib/settings';
 import '../styles/tokens.css';
 import '../styles/app.css';
 
@@ -14,12 +15,20 @@ interface Props {
 
 const {
   title,
-  description = '홍마초의 잡생각 — dev, invest, learn, daily',
+  description = SETTINGS.site.metaDescription,
   ogImage,
   publishDate,
   author,
   tags = []
 } = Astro.props;
+
+const catLightVars = SETTINGS.categories
+  .map((c) => `--cat-${c.id}:${c.color};--cat-${c.id}-bg:${c.colorBgLight};`)
+  .join('');
+const catDarkVars = SETTINGS.categories
+  .map((c) => `--cat-${c.id}-bg:${c.colorBgDark};`)
+  .join('');
+const categoryCss = `:root{${catLightVars}}:root[data-theme="dark"]{${catDarkVars}}`;
 ---
 
 <!doctype html>
@@ -55,6 +64,8 @@ const {
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <style is:global set:html={categoryCss}></style>
 
     <title>{title}</title>
 

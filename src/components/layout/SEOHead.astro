@@ -1,4 +1,6 @@
 ---
+import { SETTINGS } from '@/lib/settings';
+
 interface Props {
   title: string;
   description: string;
@@ -14,7 +16,7 @@ const {
   description,
   image = '/og-default.png',
   publishDate,
-  author = '홍마초',
+  author = SETTINGS.site.author,
   tags = [],
   type = 'website'
 } = Astro.props;
@@ -36,7 +38,7 @@ const jsonLd = type === 'article' && publishDate
       },
       publisher: {
         '@type': 'Organization',
-        name: '홍마초의 잡생각',
+        name: SETTINGS.site.title,
         logo: {
           '@type': 'ImageObject',
           url: new URL('/logo.png', Astro.site ?? 'https://hongmacho.dev').href
@@ -54,7 +56,7 @@ const jsonLd = type === 'article' && publishDate
 
 <!-- Meta Tags -->
 <meta name="description" content={description} />
-<meta name="keywords" content={tags.length > 0 ? tags.join(', ') : 'dev, invest, learn, daily'} />
+<meta name="keywords" content={tags.length > 0 ? tags.join(', ') : SETTINGS.site.keywords} />
 <meta name="author" content={author} />
 
 <!-- Open Graph -->

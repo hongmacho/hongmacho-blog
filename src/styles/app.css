@@ -15,25 +15,11 @@
   --font-display: "Pretendard Variable", "Wanted Sans Variable", "Wanted Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
-  /* Category accents — meta-prompt assignments */
-  --cat-dev:    var(--c-blue-50);     /* #0066FF */
-  --cat-dev-bg: var(--c-blue-95);
-  --cat-invest:    #f59e0b;
-  --cat-invest-bg: #fef3c7;
-  --cat-learn:    var(--c-violet-50); /* #6541F2 — close kin to #a855f7 but on-brand */
-  --cat-learn-bg: var(--c-violet-95);
-  --cat-daily:    #14b8a6;
-  --cat-daily-bg: #ccfbf1;
+  /* Category accents (--cat-{id}, --cat-{id}-bg) are injected at runtime
+     by BaseLayout.astro from blog-settings.json */
 
   /* Content width — tweakable */
   --content-width: 720px;
-}
-
-[data-theme="dark"] {
-  --cat-dev-bg: rgba(0,102,255,0.14);
-  --cat-invest-bg: rgba(245,158,11,0.16);
-  --cat-learn-bg: rgba(101,65,242,0.20);
-  --cat-daily-bg: rgba(20,184,166,0.18);
 }
 
 * { box-sizing: border-box; }

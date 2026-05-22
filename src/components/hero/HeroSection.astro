@@ -1,12 +1,20 @@
 ---
 import { getCollection } from 'astro:content';
 import HeroVariants from './HeroVariants.tsx';
+import { SETTINGS } from '@/lib/settings';
 
 const allPosts = await getCollection('blog');
 const recentTitles = [...allPosts]
   .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
   .slice(0, 15)
   .map((p) => p.data.title);
+
+const { hero } = SETTINGS;
+
+// Hero title's last character before the period is the accent (period itself).
+// Strip a trailing period from line 1 so we can wrap it in <span class="accent">.
+const line1HasPeriod = hero.titleLine1.endsWith('.');
+const line1Base = line1HasPeriod ? hero.titleLine1.slice(0, -1) : hero.titleLine1;
 ---
 
 <header class="hero hero--aurora" id="hero-root">
@@ -15,21 +23,21 @@ const recentTitles = [...allPosts]
   <div class="container">
     <span class="hero__greeting">
       <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c-green-50);box-shadow:0 0 0 4px color-mix(in srgb, var(--c-green-50) 22%, transparent);"></span>
-      지금 글을 쓰고 있어요
+      {hero.statusText}
     </span>
 
     <h1 class="hero__title">
-      개발, 투자, 학습<span class="accent">.</span><br />
-      그리고 일상의 기록<span class="hero__caret" aria-hidden="true"></span>
+      {line1Base}{line1HasPeriod && <span class="accent">.</span>}<br />
+      {hero.titleLine2}<span class="hero__caret" aria-hidden="true"></span>
     </h1>
 
     <p class="hero__sub">
-      Spring/Java 백엔드 작업, 퀀트 투자, 책·강의 메모, 그리고 가끔의 회고. 다정하지만 단정한 글을 씁니다.
+      {hero.subtitle}
     </p>
 
     <div class="hero__cta-row">
-      <a href="/blog" class="btn btn--white">최신 글 보기</a>
-      <a href="/about" class="btn btn--ghost">About</a>
+      <a href={hero.primaryCta.href} class="btn btn--white">{hero.primaryCta.label}</a>
+      <a href={hero.secondaryCta.href} class="btn btn--ghost">{hero.secondaryCta.label}</a>
     </div>
   </div>
 </header>

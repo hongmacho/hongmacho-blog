@@ -1,0 +1,91 @@
+{
+  "site": {
+    "title": "홍마초의 잡생각",
+    "shortTitle": "홍마초의 잡생각",
+    "description": "개발, 투자, 학습 그리고 일상의 기록.",
+    "metaDescription": "홍마초의 잡생각 — dev, invest, learn, daily",
+    "author": "홍마초",
+    "keywords": "dev, invest, learn, daily"
+  },
+  "hero": {
+    "statusText": "지금 글을 쓰고 있어요",
+    "titleLine1": "개발, 투자, 학습.",
+    "titleLine2": "그리고 일상의 기록",
+    "subtitle": "Spring/Java 백엔드 작업, 퀀트 투자, 책·강의 메모, 그리고 가끔의 회고. 다정하지만 단정한 글을 씁니다.",
+    "primaryCta": { "label": "최신 글 보기", "href": "/blog" },
+    "secondaryCta": { "label": "About", "href": "/about" }
+  },
+  "footer": {
+    "subtitle": "개발, 투자, 학습 그리고 일상의 기록.",
+    "copyright": "© 2026 홍마초."
+  },
+  "categories": [
+    {
+      "id": "dev",
+      "name": "개발",
+      "desc": "Spring Boot, Java, Docker, 최신 기술",
+      "color": "#0066FF",
+      "colorBgLight": "#E6F0FF",
+      "colorBgDark": "rgba(0,102,255,0.14)"
+    },
+    {
+      "id": "invest",
+      "name": "투자",
+      "desc": "퀀트 분석, 포트폴리오 관리",
+      "color": "#f59e0b",
+      "colorBgLight": "#fef3c7",
+      "colorBgDark": "rgba(245,158,11,0.16)"
+    },
+    {
+      "id": "learn",
+      "name": "학습",
+      "desc": "기술 스택, 책/강의 후기",
+      "color": "#6541F2",
+      "colorBgLight": "#EFEAFF",
+      "colorBgDark": "rgba(101,65,242,0.20)"
+    },
+    {
+      "id": "daily",
+      "name": "일상",
+      "desc": "회고, 생각, 추천",
+      "color": "#14b8a6",
+      "colorBgLight": "#ccfbf1",
+      "colorBgDark": "rgba(20,184,166,0.18)"
+    }
+  ],
+  "about": {
+    "pageTitle": "소개 | 홍마초의 잡생각",
+    "pageDescription": "안녕하세요, 소프트웨어 엔지니어 홍마초입니다.",
+    "avatarChar": "홍",
+    "name": "홍마초",
+    "role": "백엔드 개발자 · 개인 투자자 · 학습 중독자",
+    "intro": [
+      "안녕하세요. 서울에서 Spring Boot 기반 서비스를 만들고 운영하는 백엔드 개발자입니다. 코드 외 시간에는 퀀트 투자 백테스트를 돌리고, 책을 읽고, 가끔 글을 씁니다.",
+      "이 블로그는 <strong>다듬지 않은 진행 중인 생각</strong>을 모아두는 공간입니다. 완성된 정답이 아니라, 풀고 있는 문제와 그 과정의 메모. 그래서 글 사이에 일관성이 없을 때도 있습니다."
+    ],
+    "stats": [
+      { "key": "posts", "label": "총 글 수", "value": null },
+      { "key": "career", "label": "백엔드 경력", "value": "10y" },
+      { "key": "books", "label": "올해 읽은 책", "value": "42" }
+    ],
+    "topics": [
+      { "name": "개발", "desc": "Spring Boot, Next.js와 TypeScript, 그리고 옆에 둔 AI" },
+      { "name": "투자", "desc": "퀀트 백테스트, 팩터 투자, 흔들리지 않는 포트폴리오" },
+      { "name": "학습", "desc": "책·강의 메모, 나만의 학습법, 오래 가는 노트" },
+      { "name": "일상", "desc": "분기 회고, 좋아한 것들, 작게 시작한 실험들" }
+    ],
+    "interests": [
+      "코틀린 코루틴의 내부 동작",
+      "국내 ETF 기반의 단순한 퀀트 룰",
+      "\"덜 하기\"라는 생활 원칙"
+    ],
+    "contact": {
+      "intro": "이메일이 가장 빠릅니다.",
+      "email": "hongp0508@gmail.com",
+      "outro": "또는 GitHub, X(트위터)로 멘션 주세요."
+    },
+    "links": {
+      "github": "https://github.com/hongdaeri"
+    }
+  }
+}

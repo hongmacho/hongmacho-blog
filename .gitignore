@@ -25,3 +25,6 @@ npm-debug.log*
 
 # OMC internal state
 .omc/
+
+# Playwright MCP artifacts
+.playwright-mcp/
