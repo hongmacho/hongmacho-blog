@@ -26,5 +26,9 @@ npm-debug.log*
 # OMC internal state
 .omc/
 
+# Claude Code — share commands, hide personal settings
+.claude/settings.local.json
+.claude/*.local.json
+
 # Playwright MCP artifacts
 .playwright-mcp/
